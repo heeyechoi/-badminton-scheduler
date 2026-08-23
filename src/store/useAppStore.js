@@ -524,14 +524,16 @@ export const useAppStore = create(
       // Drags a roster card directly into an occupied or empty slot (court or queue),
       // replacing whoever was there (or filling in an open seat on a partial queued
       // game). Replacing someone already there needs the incoming player free right
-      // now; filling an open seat is a pre-booking, so a busy/resting player is fine
-      // there — only someone already reserved elsewhere is refused either way.
+      // now; filling an open seat is a pre-booking, so a busy (게임중) player is fine
+      // there — but 휴식중 can't be queued at all, and neither can someone already
+      // reserved elsewhere, so both are refused regardless of which case this is.
       swapInRosterPlayer: (gameId, teamKey, index, playerId) => {
         const { gamesById, players, queueOrder } = get()
         const game = gamesById[gameId]
         const incoming = players.find((p) => p.id === playerId)
         if (!game || !incoming) return
         if (reservedPlayerIds(queueOrder, gamesById).has(playerId)) return
+        if (incoming.status === '휴식중') return
 
         const outgoingId = game[teamKey][index]
         if (outgoingId === playerId) return

@@ -31,11 +31,12 @@ function QueuePlayerChip({ gameId, teamKey, index, player }) {
   }
 
   if (!player) {
-    // Filling an open seat is a pre-booking, so 게임중/휴식중 players are fine here —
-    // only someone already reserved (committed to a queued game) is excluded.
+    // Filling an open seat is a pre-booking, so 게임중 players are fine here —
+    // 휴식중 people can't be queued at all, and neither can someone already
+    // reserved (committed to a queued game).
     const reservedIds = reservedPlayerIds(queueOrder, gamesById)
     const selectable = players
-      .filter((p) => !reservedIds.has(p.id))
+      .filter((p) => !reservedIds.has(p.id) && p.status !== '휴식중')
       .sort((a, b) => {
         const skillDiff = skillIndex(a.skill) - skillIndex(b.skill)
         return skillDiff !== 0 ? skillDiff : a.name.localeCompare(b.name, 'ko')

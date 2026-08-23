@@ -35,7 +35,7 @@ export function UnplayedWithTargetList() {
           </p>
           <div className="unplayed-chips">
             {remaining.map((p) => {
-              const selectable = !reservedIds.has(p.id)
+              const selectable = !reservedIds.has(p.id) && p.status !== '휴식중'
               const selected = builderSelection.includes(p.id)
               return (
                 <button

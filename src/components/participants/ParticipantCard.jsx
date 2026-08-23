@@ -15,9 +15,10 @@ export function ParticipantCard({ player, selected, dimmed, reserved, liveGame, 
   const isMobile = useIsMobile(640)
 
   // Already committed to a queued game -> can't be double-booked into another one.
-  // Otherwise selectable even while 게임중, so the operator can pre-book their next game.
-  const selectable = !reserved
+  // 휴식중 people can't be queued at all, so they're excluded too. Otherwise
+  // selectable even while 게임중, so the operator can pre-book their next game.
   const isResting = player.status === '휴식중'
+  const selectable = !reserved && !isResting
   const canToggleRest = player.status === '대기중' || isResting
   // Dragging places someone directly into a slot, so unlike click-to-prebook this
   // needs them genuinely free right now — 게임중 people can still be click-selected.

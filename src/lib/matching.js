@@ -105,13 +105,14 @@ function combinations(arr, k) {
 
 /**
  * Players eligible to appear in a suggestion, including people currently mid-game
- * or resting (so their next game can be pre-booked ahead of time) — the only hard
- * exclusion is someone already committed to a game sitting in the waiting queue.
+ * (so their next game can be pre-booked ahead of time) — excluded are anyone
+ * already committed to a game sitting in the waiting queue, and anyone resting
+ * (휴식중 can't be queued at all).
  * @param {object[]} players
  * @param {Set<string>} [reservedIds]
  */
 export function eligiblePool(players, reservedIds = new Set()) {
-  return players.filter((p) => !reservedIds.has(p.id))
+  return players.filter((p) => !reservedIds.has(p.id) && p.status !== '휴식중')
 }
 
 function windowPool(pool, now, targetPlayerIds = []) {
