@@ -92,10 +92,10 @@ export function ParticipantsPanel() {
             player={player}
             selected={builderSelection.includes(player.id)}
             reserved={reservedIds.has(player.id)}
-            // 게임중/휴식중이어도 아직 대기열에 예약되지 않았다면 새 대기열 게임에
-            // 넣을 수 있으므로(즉시 시작은 안 되고 대기열로 가는 것뿐) 원래 색상으로
-            // 남겨둔다 — 이미 대기열 게임에 커밋된 사람만 다시 못 뽑으므로 흐리게 처리.
-            dimmed={filters.hideInGame && reservedIds.has(player.id)}
+            // 게임중이어도 아직 대기열에 예약 안 됐으면 새 대기열 게임에 넣을 수
+            // 있으므로(즉시 시작만 안 될 뿐) 원래 색상 유지. 휴식중은 대기열에도
+            // 넣을 수 없는 상태이므로 대기열 예약자와 함께 흐리게 처리.
+            dimmed={filters.hideInGame && (player.status === '휴식중' || reservedIds.has(player.id))}
             liveGame={liveGames.get(player.id)}
             queuedGame={queuedGames.get(player.id)}
           />
