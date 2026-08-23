@@ -14,6 +14,7 @@ import {
   activeGameByPlayer,
   queuedGameByPlayer,
 } from '../../store/selectors'
+import { isUnavailable } from '../../lib/playerStatus'
 import './ParticipantsPanel.css'
 
 export function ParticipantsPanel() {
@@ -92,7 +93,7 @@ export function ParticipantsPanel() {
             player={player}
             selected={builderSelection.includes(player.id)}
             reserved={reservedIds.has(player.id)}
-            dimmed={filters.hideInGame && (player.status === '게임중' || reservedIds.has(player.id))}
+            dimmed={filters.hideInGame && (isUnavailable(player) || reservedIds.has(player.id))}
             liveGame={liveGames.get(player.id)}
             queuedGame={queuedGames.get(player.id)}
           />
