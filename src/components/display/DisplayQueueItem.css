@@ -1,0 +1,60 @@
+.display-queue-item {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  margin-bottom: var(--space-3);
+}
+
+.display-queue-order {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--color-text-tertiary);
+  min-width: 28px;
+}
+
+.display-queue-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.display-queue-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-2);
+}
+
+.display-queue-player {
+  font-size: 18px;
+  font-weight: 700;
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+}
+
+.display-queue-player.gender-male {
+  background: var(--color-male-bg);
+  color: var(--color-male);
+}
+
+.display-queue-player.gender-female {
+  background: var(--color-female-bg);
+  color: var(--color-female);
+}
+
+.display-queue-player.gender-male.is-jagang {
+  background: var(--color-jagang-male-bg);
+  color: var(--color-jagang-male);
+}
+
+.display-queue-player.gender-female.is-jagang {
+  background: var(--color-jagang-female-bg);
+  color: var(--color-jagang-female);
+}
+
+.display-queue-player-skill {
+  font-weight: 800;
+  color: inherit;
+}

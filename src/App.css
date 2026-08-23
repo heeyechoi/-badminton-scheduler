@@ -1,0 +1,23 @@
+.app-shell {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-main-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  min-height: 0;
+}
+
+.app-main-grid > section {
+  min-height: 0;
+}
+
+.app-queue-column {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-left: 1px solid var(--color-border);
+}

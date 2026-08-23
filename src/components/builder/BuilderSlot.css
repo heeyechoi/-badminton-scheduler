@@ -1,0 +1,57 @@
+.builder-slot-drop {
+  display: block;
+  border-radius: var(--radius-md);
+}
+
+.builder-slot-drop.is-over {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
+}
+
+.builder-slot {
+  width: 100%;
+  border-radius: var(--radius-md);
+  height: 56px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border: none;
+  cursor: pointer;
+}
+
+.builder-slot-empty {
+  border: 1px dashed var(--color-border-strong);
+  background: var(--color-surface-sunken);
+  color: var(--color-text-tertiary);
+  font-size: 12px;
+  cursor: default;
+}
+
+.builder-slot.gender-male {
+  background: var(--color-male-bg);
+}
+
+.builder-slot.gender-female {
+  background: var(--color-female-bg);
+}
+
+.builder-slot.gender-male.is-jagang {
+  background: var(--color-jagang-male-bg);
+}
+
+.builder-slot.gender-female.is-jagang {
+  background: var(--color-jagang-female-bg);
+}
+
+.builder-slot-name {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.builder-slot-skill {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+}

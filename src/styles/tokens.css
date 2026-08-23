@@ -1,0 +1,62 @@
+:root {
+  --color-bg: #f2f4f6;
+  --color-surface: #ffffff;
+  --color-surface-sunken: #f8f9fa;
+
+  --color-text: #191f28;
+  --color-text-secondary: #6b7684;
+  --color-text-tertiary: #8b95a1;
+  --color-text-on-primary: #ffffff;
+
+  --color-border: #e5e8eb;
+  --color-border-strong: #d1d6db;
+
+  --color-primary: #3182f6;
+  --color-primary-strong: #1b64da;
+  --color-primary-bg: #e8f3ff;
+
+  --color-male: #0ea5e9;
+  --color-male-bg: #e1f4fd;
+  --color-male-bg-dim: #eef8fe;
+
+  --color-female: #ec4899;
+  --color-female-bg: #fde6f1;
+  --color-female-bg-dim: #fef0f6;
+
+  --color-jagang-male: #191f28;
+  --color-jagang-male-bg: #e1e3e8;
+
+  --color-jagang-female: #7c3aed;
+  --color-jagang-female-bg: #ece4fc;
+
+  --color-danger: #f04452;
+  --color-danger-bg: #ffeeef;
+  --color-success: #00c471;
+  --color-warning: #ff9f43;
+
+  --color-rest: #14b8a6;
+  --color-rest-bg: #d4f5ef;
+
+  --color-lime: #65a30d;
+  --color-lime-bg: #e9f9c8;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-pill: 999px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 40px;
+
+  --shadow-sm: 0 1px 2px rgba(25, 31, 40, 0.05);
+  --shadow-md: 0 4px 16px rgba(25, 31, 40, 0.08);
+  --shadow-lg: 0 8px 32px rgba(25, 31, 40, 0.12);
+
+  --font-sans: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Malgun Gothic', sans-serif;
+}

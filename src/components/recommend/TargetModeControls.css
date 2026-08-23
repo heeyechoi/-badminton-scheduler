@@ -1,0 +1,61 @@
+.target-mode {
+  margin-bottom: var(--space-3);
+}
+
+.target-mode-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--space-2);
+}
+
+.target-mode-row {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.target-mode-clear {
+  border: none;
+  background: var(--color-surface-sunken);
+  border-radius: var(--radius-md);
+  padding: 0 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.target-mode-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: var(--space-2);
+}
+
+.target-mode-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-primary-bg);
+  color: var(--color-primary-strong);
+  border-radius: var(--radius-pill);
+  padding: 4px 6px 4px 12px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.target-mode-chip button {
+  border: none;
+  background: rgba(255, 255, 255, 0.6);
+  color: inherit;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 10px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

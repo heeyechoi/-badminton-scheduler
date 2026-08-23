@@ -1,0 +1,12 @@
+.skill-game-count-skill {
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.skill-game-count-sep {
+  margin: 0 4px;
+}
+
+.skill-game-count-games {
+  font-weight: 500;
+}

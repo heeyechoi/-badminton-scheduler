@@ -1,0 +1,11 @@
+.waiting-queue-panel {
+  flex: 1;
+  padding: var(--space-5);
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.queue-list {
+  display: flex;
+  flex-direction: column;
+}

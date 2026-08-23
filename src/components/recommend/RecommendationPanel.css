@@ -1,0 +1,9 @@
+.recommendation-panel {
+  padding: var(--space-5);
+  overflow-y: auto;
+}
+
+.suggestion-list {
+  display: flex;
+  flex-direction: column;
+}

@@ -1,0 +1,125 @@
+.suggestion-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.suggestion-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.suggestion-card-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.suggestion-card-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  row-gap: 10px;
+  column-gap: 4px;
+  position: relative;
+}
+
+/* Marks the row boundary between team A (top) and team B (bottom) — left/right
+   within a row are teammates, so this line is the only thing separating sides. */
+.suggestion-card-grid::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  border-top: 1px solid var(--color-border-strong);
+  pointer-events: none;
+}
+
+.suggestion-player {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  border: 2px solid transparent;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+}
+
+.suggestion-player.is-selected {
+  border-color: var(--color-primary);
+}
+
+.suggestion-player.is-locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.suggestion-player.gender-male {
+  background: var(--color-male-bg);
+  color: var(--color-male);
+}
+
+.suggestion-player.gender-female {
+  background: var(--color-female-bg);
+  color: var(--color-female);
+}
+
+.suggestion-player.gender-male.is-jagang {
+  background: var(--color-jagang-male-bg);
+  color: var(--color-jagang-male);
+}
+
+.suggestion-player.gender-female.is-jagang {
+  background: var(--color-jagang-female-bg);
+  color: var(--color-jagang-female);
+}
+
+.suggestion-player.is-busy {
+  border: 1px dashed currentColor;
+  opacity: 0.75;
+}
+
+/* Resting always wins visually, regardless of gender/자강 coloring above. */
+.suggestion-player.is-resting {
+  background: var(--color-rest-bg) !important;
+  color: var(--color-rest) !important;
+}
+
+/* Skill matches the name's color here instead of SkillGameCount's default black. */
+.suggestion-player .skill-game-count-skill {
+  color: inherit;
+}
+
+.suggestion-card-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.suggestion-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.suggestion-btn.accept {
+  background: #e5faf1;
+  color: var(--color-success);
+}
+
+.suggestion-btn.reject {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}

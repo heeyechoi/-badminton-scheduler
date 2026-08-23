@@ -1,0 +1,79 @@
+.app-header {
+  height: 64px;
+  padding: 0 var(--space-5);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.app-header-title {
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.app-header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.session-timer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  background: var(--color-surface-sunken);
+  border-radius: var(--radius-pill);
+  padding: 8px 18px;
+}
+
+.session-timer-item {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.session-timer-label {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+}
+
+.session-timer-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.session-timer-value-primary {
+  font-size: 15px;
+  color: var(--color-primary);
+}
+
+.session-timer-sep {
+  color: var(--color-border-strong);
+}
+
+.preview-btn {
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 9px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  background: var(--color-primary-bg);
+  color: var(--color-primary-strong);
+  cursor: pointer;
+}
+
+.settings-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--color-surface-sunken);
+  cursor: pointer;
+  font-size: 16px;
+}

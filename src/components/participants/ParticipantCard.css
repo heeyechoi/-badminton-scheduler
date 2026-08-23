@@ -1,0 +1,149 @@
+.participant-card {
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  cursor: pointer;
+  position: relative;
+  transition: all 0.15s ease;
+  border: 2px solid transparent;
+  border-left-width: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.participant-card.gender-male {
+  background: var(--color-male-bg);
+  border-left-color: var(--color-male);
+}
+
+.participant-card.gender-female {
+  background: var(--color-female-bg);
+  border-left-color: var(--color-female);
+}
+
+.participant-card.is-selected {
+  border-color: var(--color-primary);
+}
+
+.participant-card.is-dimmed {
+  opacity: 0.45;
+}
+
+.participant-card.is-locked {
+  cursor: default;
+}
+
+.participant-card-main {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.participant-card-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.participant-card-skill {
+  font-size: 14px;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1;
+  padding: 4px 9px;
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-sm);
+}
+
+.participant-card.gender-male .participant-card-skill {
+  background: var(--color-male);
+}
+
+.participant-card.gender-female .participant-card-skill {
+  background: var(--color-female);
+}
+
+.participant-card.gender-male.is-jagang {
+  background: var(--color-jagang-male-bg);
+  border-left-color: var(--color-jagang-male);
+}
+
+.participant-card.gender-female.is-jagang {
+  background: var(--color-jagang-female-bg);
+  border-left-color: var(--color-jagang-female);
+}
+
+.participant-card.gender-male.is-jagang .participant-card-skill {
+  background: var(--color-jagang-male);
+}
+
+.participant-card.gender-female.is-jagang .participant-card-skill {
+  background: var(--color-jagang-female);
+}
+
+/* Resting always wins visually, regardless of gender/자강 coloring above. */
+.participant-card.is-resting {
+  background: var(--color-rest-bg) !important;
+  border-left-color: var(--color-rest) !important;
+}
+
+.participant-card.is-resting .participant-card-skill {
+  background: var(--color-rest) !important;
+}
+
+.participant-card-sub {
+  font-size: 11px;
+  color: var(--color-text-tertiary);
+}
+
+.participant-card-footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.participant-card-games {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  font-weight: 600;
+}
+
+.participant-card-type-breakdown {
+  font-size: 10px;
+  color: var(--color-text-tertiary);
+}
+
+.participant-card-type-breakdown.is-high {
+  color: var(--color-warning);
+  font-weight: 700;
+}
+
+.participant-status-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+  background: rgba(25, 31, 40, 0.08);
+  color: var(--color-text-secondary);
+}
+
+.participant-rest-btn {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  border: none;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: var(--radius-pill);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.participant-card:hover .participant-rest-btn {
+  opacity: 1;
+}

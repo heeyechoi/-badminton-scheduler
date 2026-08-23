@@ -1,0 +1,48 @@
+.court-board {
+  padding: var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+  position: relative;
+}
+
+.section-title {
+  font-size: 16px;
+  margin: 0 0 var(--space-3);
+}
+
+.court-board-row {
+  display: flex;
+  gap: var(--space-3);
+  overflow-x: auto;
+  padding-bottom: var(--space-1);
+}
+
+.court-board-toast {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-5);
+  background: var(--color-text);
+  color: var(--color-text-on-primary);
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: var(--shadow-md);
+  animation: toast-fade 2.4s ease forwards;
+}
+
+@keyframes toast-fade {
+  0% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  10% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}

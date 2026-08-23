@@ -1,0 +1,35 @@
+.pair-history {
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
+.pair-history-title {
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  margin: 0 0 var(--space-2);
+  font-weight: 600;
+}
+
+.pair-history-list {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px 8px;
+}
+
+.pair-history-item {
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pair-history-count {
+  font-weight: 700;
+  color: var(--color-text-tertiary);
+}
+
+.pair-history-count.is-high {
+  color: var(--color-warning);
+}

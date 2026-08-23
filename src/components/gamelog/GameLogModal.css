@@ -1,0 +1,181 @@
+.gamelog-layout {
+  display: flex;
+  gap: var(--space-4);
+  height: 60vh;
+}
+
+.gamelog-side {
+  width: 220px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-height: 0;
+}
+
+.gamelog-player-list {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.gamelog-player-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  border: none;
+  border-left: 4px solid transparent;
+  border-radius: var(--radius-md);
+  padding: 8px var(--space-3);
+  font-size: 13px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.gamelog-player-row.gender-male {
+  background: var(--color-male-bg-dim);
+  border-left-color: var(--color-male);
+}
+
+.gamelog-player-row.gender-female {
+  background: var(--color-female-bg-dim);
+  border-left-color: var(--color-female);
+}
+
+.gamelog-player-row.gender-male.is-jagang {
+  background: var(--color-jagang-male-bg);
+  border-left-color: var(--color-jagang-male);
+}
+
+.gamelog-player-row.gender-female.is-jagang {
+  background: var(--color-jagang-female-bg);
+  border-left-color: var(--color-jagang-female);
+}
+
+.gamelog-player-row.is-selected {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+.gamelog-player-name {
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.gamelog-player-skill {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--color-text-secondary);
+}
+
+.gamelog-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  border-left: 1px solid var(--color-border);
+  padding-left: var(--space-4);
+  min-height: 0;
+}
+
+.gamelog-main-header {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.gamelog-main-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.gamelog-main-skill {
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--color-text-secondary);
+}
+
+.gamelog-main-count {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+}
+
+.gamelog-entries {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.gamelog-entry {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gamelog-entry-top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.gamelog-entry-time {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--color-text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
+.gamelog-entry-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+}
+
+.gamelog-entry-player {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  border: 2px solid transparent;
+}
+
+.gamelog-entry-player.is-self {
+  border-color: var(--color-primary);
+}
+
+.gamelog-entry-player.gender-male {
+  background: var(--color-male-bg);
+  color: var(--color-male);
+}
+
+.gamelog-entry-player.gender-female {
+  background: var(--color-female-bg);
+  color: var(--color-female);
+}
+
+.gamelog-entry-player.gender-male.is-jagang {
+  background: var(--color-jagang-male-bg);
+  color: var(--color-jagang-male);
+}
+
+.gamelog-entry-player.gender-female.is-jagang {
+  background: var(--color-jagang-female-bg);
+  color: var(--color-jagang-female);
+}
+
+.gamelog-entry-player .skill-game-count-skill {
+  color: inherit;
+}
