@@ -9,10 +9,11 @@ const MAX_SHARED_PLAYERS = 2
 
 // Skill quality is weighted highest so a genuinely mismatched foursome (e.g. 자강
 // carried by only lower-tier players) can't out-rank a well-matched one just
-// because it happens to score well on novelty/fairness. typeBalance is the newest,
-// smallest-weighted factor — a nudge toward everyone getting a mix of 혼복 and
-// same-gender doubles over the session, not a hard requirement.
-const WEIGHTS = { skill: 0.35, fairness: 0.2, ratio: 0.15, repeat: 0.2, typeBalance: 0.1 }
+// because it happens to score well on novelty/fairness. typeBalance carries real
+// weight (not a token nudge) — combined with its worst-served-player scoring in
+// fairness.js, someone heavily skewed toward one type (e.g. 혼복 9 vs 여복 4)
+// should visibly get steered toward the type they're missing.
+const WEIGHTS = { skill: 0.35, fairness: 0.15, ratio: 0.15, repeat: 0.15, typeBalance: 0.2 }
 const TARGET_MODE_BOOST = 0.5
 // Suggestions that would pull in a player currently mid-game or resting are still
 // useful (pre-booking their next game), but should rank behind equally-good all-available ones.
@@ -27,14 +28,42 @@ const GENDER_SPLIT_PENALTY = 0.3
 // played — even once is enough to stop counting a pair as "fresh" — so it doesn't
 // keep suppressing cross-band matches once same-skill novelty is mostly exhausted.
 const CROSS_BAND_NOVELTY_PENALTY_MAX = 0.4
+// The overall-group skillScore only measures how spread out all 4 players are —
+// it doesn't check whether the actual team split (teamA vs teamB) stays even.
+// A 자강 stuck with a weak partner against a merely-mediocre pair can still land
+// a decent skillScore while the real match is lopsided, so penalize the gap in
+// the best-available split directly. Reference gap chosen so a split as wide as
+// "자강+D조" vs "A조+E조" (gap 4) is already meaningfully penalized.
+const TEAM_SPLIT_IMBALANCE_PENALTY_MAX = 0.5
+const TEAM_SPLIT_GAP_REFERENCE = 6
+// If 3 of the 4 people in an all-same-skill-label group have already played each
+// other 3+ times, that trio is "saturated" — completing it with yet another
+// same-skill 4th just keeps cycling the same small circle. A candidate that
+// instead mixes in someone from a different (often lower) skill tier isn't
+// all-same-skill, so it skips this penalty and naturally ranks ahead.
+const SATURATED_TRIO_REPEAT_THRESHOLD = 3
+const SATURATED_TRIO_PENALTY = 0.4
+
+function hasSaturatedTrio(group, threshold) {
+  for (let skip = 0; skip < group.length; skip++) {
+    const trio = group.filter((_, i) => i !== skip)
+    const allPairsSaturated = trio.every((p, i) =>
+      trio.every((q, j) => i === j || (p.pairHistory?.[q.id] ?? 0) >= threshold),
+    )
+    if (allPairsSaturated) return true
+  }
+  return false
+}
 
 /**
  * Fraction of same-skill-label pairs in the pool that have never played together.
  * 1 = every same-skill pair is still fresh (early session), 0 = they've all played
- * at least once already (or no skill label has 2+ people in the pool).
+ * at least once already (or no skill label has 2+ people in the pool). A pair
+ * currently playing together mid-game also counts as no longer fresh.
  * @param {{skill:string, id:string, pairHistory:Record<string,number>}[]} pool
+ * @param {Map<string, object>} [activeGameByPlayer]
  */
-function sameSkillNoveltySupply(pool) {
+function sameSkillNoveltySupply(pool, activeGameByPlayer) {
   const bySkill = new Map()
   for (const p of pool) {
     if (!bySkill.has(p.skill)) bySkill.set(p.skill, [])
@@ -46,7 +75,11 @@ function sameSkillNoveltySupply(pool) {
     for (let i = 0; i < group.length; i++) {
       for (let j = i + 1; j < group.length; j++) {
         total++
-        if (!group[i].pairHistory?.[group[j].id]) fresh++
+        const a = group[i]
+        const b = group[j]
+        const gameA = activeGameByPlayer?.get(a.id)
+        const playingTogether = gameA && activeGameByPlayer.get(b.id)?.id === gameA.id
+        if (!a.pairHistory?.[b.id] && !playingTogether) fresh++
       }
     }
   }
@@ -115,9 +148,13 @@ export function scoreCandidate(group, pool, options = {}) {
   const { classification, skillScore } = classifyAndScoreSkill(group)
   const fairness = fairnessScore(group, pool, options.now)
   const ratio = ratioBalanceScore(group, classification)
-  const repeat = repeatScore(group)
+  const repeat = repeatScore(group, options.activeGameByPlayer)
   const type = deriveGameType(group)
   const typeBalance = typeBalanceScore(group, type)
+  // Pre-compute the same split acceptSuggestion will register, so the card can
+  // display real team pairing (left/right = teammates) instead of a flat list —
+  // and so the team-split-gap penalty below can see how lopsided it really is.
+  const { teamA, teamB, gap: teamSplitGap } = balancedTeamSplit(group, type)
 
   let total =
     WEIGHTS.skill * skillScore +
@@ -143,7 +180,12 @@ export function scoreCandidate(group, pool, options = {}) {
 
   const men = group.filter((p) => p.gender === '남').length
   const women = group.filter((p) => p.gender === '여').length
-  const isLopsidedSplit = (men === 1 && women === 3) || (men === 3 && women === 1)
+  // A 3남+1여 group isn't actually lopsided when that one woman is 자강 — she's
+  // skill-comparable to the men (see effectivePosition in skill.js), so this reads
+  // as a legitimate 남복 game (deriveGameType agrees), not a gender mismatch.
+  const isJagangWomanException =
+    men === 3 && women === 1 && group.some((p) => p.gender === '여' && p.skill === '자강')
+  const isLopsidedSplit = !isJagangWomanException && ((men === 1 && women === 3) || (men === 3 && women === 1))
   if (isLopsidedSplit) {
     const poolMen = pool.filter((p) => p.gender === '남').length
     const poolWomen = pool.filter((p) => p.gender === '여').length
@@ -151,13 +193,17 @@ export function scoreCandidate(group, pool, options = {}) {
   }
 
   if (classification === '즐겜') {
-    const supply = sameSkillNoveltySupply(pool)
+    const supply = sameSkillNoveltySupply(pool, options.activeGameByPlayer)
     if (supply > 0) total *= 1 - CROSS_BAND_NOVELTY_PENALTY_MAX * supply
   }
 
-  // Pre-compute the same split acceptSuggestion will register, so the card can
-  // display real team pairing (left/right = teammates) instead of a flat list.
-  const { teamA, teamB } = balancedTeamSplit(group, type)
+  const normalizedTeamGap = Math.min(1, teamSplitGap / TEAM_SPLIT_GAP_REFERENCE)
+  total *= 1 - TEAM_SPLIT_IMBALANCE_PENALTY_MAX * normalizedTeamGap
+
+  const allSameSkill = group.every((p) => p.skill === group[0].skill)
+  if (allSameSkill && hasSaturatedTrio(group, SATURATED_TRIO_REPEAT_THRESHOLD)) {
+    total *= SATURATED_TRIO_PENALTY
+  }
 
   return {
     type,
@@ -185,6 +231,8 @@ export function scoreCandidate(group, pool, options = {}) {
  * @param {Set<string>} [options.activeSignatures] exact player-id-set signatures to skip (already playing
  *   that exact foursome right now — pairHistory only updates when their game ends, so without this they'd
  *   look like a never-played match and get suggested again mid-game)
+ * @param {Map<string, object>} [options.activeGameByPlayer] from selectors.activeGameByPlayer() — lets
+ *   repeat/novelty scoring count a pair's current in-progress game, not just completed history
  * @param {string[]} [options.typeFilter] restrict to these game types (applied before ranking, so a
  *   valid but lower-scoring type still surfaces instead of being crowded out by unfiltered top picks)
  * @param {number} [options.topN]
@@ -205,7 +253,11 @@ export function generateSuggestions(players, options = {}) {
       if (options.cooldownSignatures?.has(signature)) return null
       if (options.activeSignatures?.has(signature)) return null
       if (options.typeFilter?.length && !options.typeFilter.includes(deriveGameType(group))) return null
-      const score = scoreCandidate(group, pool, { targetPlayerIds: options.targetPlayerIds, now })
+      const score = scoreCandidate(group, pool, {
+        targetPlayerIds: options.targetPlayerIds,
+        activeGameByPlayer: options.activeGameByPlayer,
+        now,
+      })
       return { id: signature, players: group, ...score }
     })
     .filter(Boolean)
@@ -228,14 +280,26 @@ export function generateSuggestions(players, options = {}) {
 
 /**
  * Everyone on the roster who still hasn't played a game with ANY of the targets —
- * having played with even one target is enough to drop off this list. Tracks
- * progress across the whole session, so it deliberately ignores current availability.
+ * having played with even one target is enough to drop off this list. Playing with
+ * one right now (mid-game), or already having a queued game together lined up,
+ * both count the same as having already played with them. Tracks progress across
+ * the whole session, so it deliberately ignores current availability otherwise.
+ * @param {Map<string, object>} [activeGameByPlayer]
+ * @param {Map<string, object>} [queuedGameByPlayer]
  */
-export function unplayedWithTargets(players, targetPlayerIds) {
+export function unplayedWithTargets(players, targetPlayerIds, activeGameByPlayer, queuedGameByPlayer) {
   if (!targetPlayerIds?.length) return []
-  return players.filter(
-    (p) =>
-      !targetPlayerIds.includes(p.id) &&
-      targetPlayerIds.every((tid) => !p.pairHistory?.[tid]),
-  )
+  const sharesGame = (byPlayerMap, aId, bId) => {
+    const gameA = byPlayerMap?.get(aId)
+    return Boolean(gameA && byPlayerMap.get(bId)?.id === gameA.id)
+  }
+  return players.filter((p) => {
+    if (targetPlayerIds.includes(p.id)) return false
+    return targetPlayerIds.every((tid) => {
+      if (p.pairHistory?.[tid]) return false
+      if (sharesGame(activeGameByPlayer, p.id, tid)) return false
+      if (sharesGame(queuedGameByPlayer, p.id, tid)) return false
+      return true
+    })
+  })
 }

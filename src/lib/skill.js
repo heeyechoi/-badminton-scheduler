@@ -116,7 +116,10 @@ export function balancedTeamSplit(players, type) {
     }
   }
 
-  return { teamA: best[0].map((p) => p.id), teamB: best[1].map((p) => p.id) }
+  // gap is the best-available team gap — even the most even split can still be
+  // lopsided (e.g. a 자강 stuck with a weak partner against a mediocre pair),
+  // which the overall group classification alone doesn't always catch.
+  return { teamA: best[0].map((p) => p.id), teamB: best[1].map((p) => p.id), gap: bestGap }
 }
 
 export function skillPosition(skill) {

@@ -21,3 +21,65 @@
   min-height: 0;
   border-left: 1px solid var(--color-border);
 }
+
+/* Below this width the three-column dashboard layout no longer fits — stack
+   everything into one scrollable column instead of cramming/scrolling panels
+   independently, which is much easier to use with touch. */
+@media (max-width: 900px) {
+  .app-shell {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .app-main-grid {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .app-main-grid > section {
+    min-height: auto;
+  }
+
+  .app-queue-column {
+    border-left: none;
+    border-top: 1px solid var(--color-border);
+  }
+}
+
+.app-mobile-tabs {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.mobile-tab-bar {
+  display: flex;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.mobile-tab-btn {
+  flex: 1;
+  border: none;
+  background: none;
+  padding: var(--space-3) var(--space-2);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+
+.mobile-tab-btn.is-active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+.app-mobile-tab-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}

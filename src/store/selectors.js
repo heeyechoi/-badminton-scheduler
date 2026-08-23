@@ -31,11 +31,14 @@ export function filteredParticipants(players, filters, reservedIds = new Set()) 
       return skillDiff !== 0 ? skillDiff : a.name.localeCompare(b.name, 'ko')
     })
 
+  // "게임 수 적은 순" is a pure game-count ranking, on purpose — mixing in busy/reserved
+  // people (not just available ones) is the point, so the operator can see exactly
+  // who's most overdue for a game regardless of what they're doing right now.
   if (filters.sortByGameCount) {
-    result = result.slice().sort((a, b) => a.totalGames - b.totalGames)
+    return result.slice().sort((a, b) => a.totalGames - b.totalGames)
   }
 
-  // Available people always float to the top regardless of the sort mode above.
+  // Otherwise, available people always float to the top.
   return result.sort((a, b) => Number(isBusy(a, reservedIds)) - Number(isBusy(b, reservedIds)))
 }
 
@@ -45,6 +48,19 @@ export function activeGameByPlayer(gamesById) {
   for (const game of Object.values(gamesById)) {
     if (game.status !== 'active') continue
     for (const pid of gamePlayerIds(game)) map.set(pid, game)
+  }
+  return map
+}
+
+/** Maps playerId -> the queued (not yet started) game they're already committed to, if any. */
+export function queuedGameByPlayer(queueOrder, gamesById) {
+  const map = new Map()
+  for (const gameId of queueOrder) {
+    const game = gamesById[gameId]
+    if (!game) continue
+    for (const pid of gamePlayerIds(game)) {
+      if (pid) map.set(pid, game)
+    }
   }
   return map
 }
@@ -74,9 +90,28 @@ export function playersById(players) {
   return map
 }
 
-export function pairCount(playerA, playerB) {
+/**
+ * True if two players are both members of the same currently-active (on-court)
+ * game right now. pairHistory only updates when a game ends, so a pair who are
+ * mid-game together would otherwise still look like they've "never played".
+ * @param {Map<string, object>} activeGameByPlayer from activeGameByPlayer()
+ */
+export function playingTogetherNow(playerA, playerB, activeGameByPlayer) {
+  if (!playerA || !playerB || !activeGameByPlayer) return false
+  const gameA = activeGameByPlayer.get(playerA.id)
+  if (!gameA) return false
+  return activeGameByPlayer.get(playerB.id)?.id === gameA.id
+}
+
+/**
+ * How many games these two have played together, counting their current
+ * in-progress game (if any) alongside completed history.
+ * @param {Map<string, object>} [activeGameByPlayer] from activeGameByPlayer()
+ */
+export function pairCount(playerA, playerB, activeGameByPlayer) {
   if (!playerA || !playerB) return 0
-  return playerA.pairHistory?.[playerB.id] ?? 0
+  const completed = playerA.pairHistory?.[playerB.id] ?? 0
+  return completed + (playingTogetherNow(playerA, playerB, activeGameByPlayer) ? 1 : 0)
 }
 
 /**

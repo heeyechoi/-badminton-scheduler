@@ -1,7 +1,7 @@
 import { useAppStore } from '../../store/useAppStore'
 import { unplayedWithTargets } from '../../lib/matching'
 import { skillIndex } from '../../lib/skill'
-import { reservedPlayerIds } from '../../store/selectors'
+import { reservedPlayerIds, activeGameByPlayer, queuedGameByPlayer } from '../../store/selectors'
 import './UnplayedWithTargetList.css'
 
 export function UnplayedWithTargetList() {
@@ -17,7 +17,9 @@ export function UnplayedWithTargetList() {
   const targets = targetPlayerIds.map((id) => players.find((p) => p.id === id)).filter(Boolean)
   const targetNames = targets.map((p) => p.name).join(', ')
   const reservedIds = reservedPlayerIds(queueOrder, gamesById)
-  const remaining = unplayedWithTargets(players, targetPlayerIds).sort((a, b) => {
+  const activeByPlayer = activeGameByPlayer(gamesById)
+  const queuedByPlayer = queuedGameByPlayer(queueOrder, gamesById)
+  const remaining = unplayedWithTargets(players, targetPlayerIds, activeByPlayer, queuedByPlayer).sort((a, b) => {
     const skillDiff = skillIndex(a.skill) - skillIndex(b.skill)
     return skillDiff !== 0 ? skillDiff : a.name.localeCompare(b.name, 'ko')
   })

@@ -1,16 +1,20 @@
-import { pairCount } from '../../store/selectors'
+import { pairCount, activeGameByPlayer as buildActiveGameByPlayer } from '../../store/selectors'
+import { useAppStore } from '../../store/useAppStore'
 import './PairHistoryBadge.css'
 
 export function PairHistoryBadge({ selectedPlayers }) {
+  const gamesById = useAppStore((s) => s.gamesById)
+
   if (selectedPlayers.length < 2) return null
 
+  const activeByPlayer = buildActiveGameByPlayer(gamesById)
   const pairs = []
   for (let i = 0; i < selectedPlayers.length; i++) {
     for (let j = i + 1; j < selectedPlayers.length; j++) {
       pairs.push({
         a: selectedPlayers[i],
         b: selectedPlayers[j],
-        count: pairCount(selectedPlayers[i], selectedPlayers[j]),
+        count: pairCount(selectedPlayers[i], selectedPlayers[j], activeByPlayer),
       })
     }
   }

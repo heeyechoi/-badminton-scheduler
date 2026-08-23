@@ -6,17 +6,43 @@
   border-right: 1px solid var(--color-border);
 }
 
+@media (max-width: 900px) {
+  .participants-panel {
+    overflow-y: visible;
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--space-4);
+  }
+}
+
 .panel-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2);
   margin-bottom: var(--space-3);
 }
 
-.participants-games-note {
-  font-size: 11px;
-  font-weight: 400;
+.panel-header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+/* .section-title carries a bottom margin for its usual standalone use (spacing
+   it from content below) — here it sits next to filter chips in one row, so
+   that margin would throw off the vertical centering between the two. */
+.panel-header-left .section-title {
+  margin: 0;
+}
+
+.info-icon {
+  font-size: 13px;
   color: var(--color-text-tertiary);
+  cursor: help;
 }
 
 .participants-list {

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { DndContext, PointerSensor, closestCenter, useSensor, useSensors } from '@dnd-kit/core'
 import { arrayMove } from '@dnd-kit/sortable'
 import { Header } from './components/layout/Header'
@@ -9,12 +9,21 @@ import { ManualGameBuilder } from './components/builder/ManualGameBuilder'
 import { RecommendationPanel } from './components/recommend/RecommendationPanel'
 import { WaitingQueuePanel } from './components/queue/WaitingQueuePanel'
 import { useAppStore } from './store/useAppStore'
+import { useIsMobile } from './hooks/useIsMobile'
 import { parseDragId } from './lib/dragIds'
 import { lightenHex } from './lib/colorBlend'
 import './App.css'
 
+const MOBILE_TABS = [
+  { id: 'participants', label: '수동매칭·참가자' },
+  { id: 'recommend', label: '추천매칭' },
+  { id: 'queue', label: '대기' },
+]
+
 export default function App() {
   const sessionStarted = useAppStore((s) => Boolean(s.session.startedAt))
+  const isMobile = useIsMobile(640)
+  const [mobileTab, setMobileTab] = useState('participants')
   const gamesById = useAppStore((s) => s.gamesById)
   const queueOrder = useAppStore((s) => s.queueOrder)
   const swapPlayers = useAppStore((s) => s.swapPlayers)
@@ -95,14 +104,43 @@ export default function App() {
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <Header />
         <CourtBoard />
-        <div className="app-main-grid">
-          <ParticipantsPanel />
-          <RecommendationPanel />
-          <div className="app-queue-column">
-            <ManualGameBuilder />
-            <WaitingQueuePanel />
+        {isMobile ? (
+          <div className="app-mobile-tabs">
+            <div className="mobile-tab-bar" role="tablist">
+              {MOBILE_TABS.map((tab) => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={mobileTab === tab.id}
+                  className={`mobile-tab-btn ${mobileTab === tab.id ? 'is-active' : ''}`}
+                  onClick={() => setMobileTab(tab.id)}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+            <div className="app-mobile-tab-panel">
+              {mobileTab === 'participants' && (
+                <>
+                  <ParticipantsPanel />
+                  <ManualGameBuilder />
+                </>
+              )}
+              {mobileTab === 'recommend' && <RecommendationPanel />}
+              {mobileTab === 'queue' && <WaitingQueuePanel />}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="app-main-grid">
+            <ParticipantsPanel />
+            <RecommendationPanel />
+            <div className="app-queue-column">
+              <ManualGameBuilder />
+              <WaitingQueuePanel />
+            </div>
+          </div>
+        )}
       </DndContext>
     </div>
   )

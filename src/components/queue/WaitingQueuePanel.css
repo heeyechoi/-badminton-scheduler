@@ -5,6 +5,14 @@
   min-height: 0;
 }
 
+@media (max-width: 900px) {
+  .waiting-queue-panel {
+    flex: none;
+    overflow-y: visible;
+    padding: var(--space-4);
+  }
+}
+
 .queue-list {
   display: flex;
   flex-direction: column;

@@ -77,3 +77,28 @@
   cursor: pointer;
   font-size: 16px;
 }
+
+@media (max-width: 900px) {
+  .app-header {
+    height: auto;
+    flex-wrap: wrap;
+    padding: var(--space-3) var(--space-4);
+    gap: var(--space-2);
+  }
+
+  .app-header-right {
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    width: 100%;
+  }
+
+  .session-timer {
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    padding: 6px 12px;
+  }
+
+  .session-timer-item {
+    white-space: nowrap;
+  }
+}

@@ -39,6 +39,11 @@
   gap: 7px;
 }
 
+.participant-card-main .participant-card-games {
+  margin-left: auto;
+  white-space: nowrap;
+}
+
 .participant-card-name {
   font-size: 15px;
   font-weight: 700;
@@ -146,4 +151,31 @@
 
 .participant-card:hover .participant-rest-btn {
   opacity: 1;
+}
+
+/* Cards were taking 4 stacked lines each, wasting scroll space on a phone —
+   drop the affiliation line (usually just "소속 없음") and tighten spacing;
+   game count already moved up next to the name/skill in the JSX above. */
+@media (max-width: 640px) {
+  .participant-card {
+    padding: 8px var(--space-2);
+    gap: 2px;
+  }
+
+  .participant-card-sub {
+    display: none;
+  }
+
+  .participant-card-name {
+    font-size: 13px;
+  }
+
+  .participant-card-skill {
+    font-size: 11px;
+    padding: 2px 7px;
+  }
+
+  .participant-card-type-breakdown {
+    font-size: 9px;
+  }
 }

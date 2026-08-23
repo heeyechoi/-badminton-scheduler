@@ -456,9 +456,16 @@ export const useAppStore = create(
           return { ...game, type, classification }
         }
 
-        function resolveStatus(player, newGameStatus) {
-          if (newGameStatus === 'active') return '게임중'
-          return player.status === '게임중' ? '대기중' : player.status
+        // A player's raw status can be 게임중 for a totally unrelated reason (already
+        // playing a DIFFERENT active court while merely reserved in gA/gB's queued
+        // slot) — using that raw status as a proxy for "are they leaving an active
+        // game" incorrectly resets them to 대기중 in that case, even though their
+        // real court game is untouched. Whether status changes must depend on the
+        // actual game they're leaving/entering, not their possibly-unrelated status.
+        function resolveStatus(player, fromGameStatus, toGameStatus) {
+          if (toGameStatus === 'active') return '게임중'
+          if (fromGameStatus === 'active') return '대기중'
+          return player.status
         }
 
         let updatedA
@@ -499,8 +506,12 @@ export const useAppStore = create(
             [updatedB.id]: updatedB,
           },
           players: state.players.map((p) => {
-            if (p.id === playerAId) return { ...p, status: resolveStatus(byId(playerAId), updatedB.status) }
-            if (p.id === playerBId) return { ...p, status: resolveStatus(byId(playerBId), updatedA.status) }
+            if (p.id === playerAId) {
+              return { ...p, status: resolveStatus(byId(playerAId), gA.status, updatedB.status) }
+            }
+            if (p.id === playerBId) {
+              return { ...p, status: resolveStatus(byId(playerBId), gB.status, updatedA.status) }
+            }
             return p
           }),
           toast,

@@ -5,7 +5,7 @@ import { UnplayedWithTargetList } from './UnplayedWithTargetList'
 import { Chip } from '../common/Chip'
 import { useAppStore } from '../../store/useAppStore'
 import { generateSuggestions } from '../../lib/matching'
-import { reservedPlayerIds, activeGameSignatures } from '../../store/selectors'
+import { reservedPlayerIds, activeGameSignatures, activeGameByPlayer } from '../../store/selectors'
 import { GAME_TYPES } from '../../data/skillLevels'
 import './RecommendationPanel.css'
 
@@ -21,8 +21,8 @@ export function RecommendationPanel() {
   const targetModeEnabled = useAppStore((s) => s.targetModeEnabled)
   const [typeFilter, setTypeFilter] = useState([])
 
-  const toggleType = (type) => {
-    setTypeFilter((prev) => (prev.includes(type) ? [] : [type]))
+  const selectType = (type) => {
+    setTypeFilter(type === null ? [] : [type])
   }
 
   const reservedIds = useMemo(
@@ -31,6 +31,7 @@ export function RecommendationPanel() {
   )
 
   const activeSignatures = useMemo(() => activeGameSignatures(gamesById), [gamesById])
+  const activeByPlayer = useMemo(() => activeGameByPlayer(gamesById), [gamesById])
 
   const suggestions = useMemo(() => {
     const cooldownSignatures = new Set(Object.keys(rejectedSignatures))
@@ -38,27 +39,32 @@ export function RecommendationPanel() {
       targetPlayerIds,
       cooldownSignatures,
       activeSignatures,
+      activeGameByPlayer: activeByPlayer,
       typeFilter,
       reservedIds,
       topN: DISPLAY_COUNT,
     })
-  }, [players, targetPlayerIds, rejectedSignatures, activeSignatures, typeFilter, reservedIds])
+  }, [players, targetPlayerIds, rejectedSignatures, activeSignatures, activeByPlayer, typeFilter, reservedIds])
 
   return (
     <section className="recommendation-panel">
       <div className="panel-header">
-        <h2 className="section-title">추천 매칭</h2>
+        <div className="panel-header-left">
+          <h2 className="section-title">추천 매칭</h2>
+          <div className="filter-chip-group">
+            <Chip active={typeFilter.length === 0} onClick={() => selectType(null)}>
+              전체보기
+            </Chip>
+            {GAME_TYPES.map((type) => (
+              <Chip key={type} active={typeFilter.includes(type)} onClick={() => selectType(type)}>
+                {type}
+              </Chip>
+            ))}
+          </div>
+        </div>
         <button type="button" className="icon-btn" onClick={clearRejectedSignatures} aria-label="새로고침">
           ↺
         </button>
-      </div>
-
-      <div className="setup-chip-row" style={{ marginBottom: 'var(--space-3)' }}>
-        {GAME_TYPES.map((type) => (
-          <Chip key={type} active={typeFilter.includes(type)} onClick={() => toggleType(type)}>
-            {type}
-          </Chip>
-        ))}
       </div>
 
       {targetModeEnabled && (

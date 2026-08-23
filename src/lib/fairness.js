@@ -53,19 +53,30 @@ export function typeBalanceScore(group, type) {
     const pull = type === '혼복' ? sameGender / mixed : mixed / sameGender
     return clamp(pull / 2, 0, 1)
   })
-  return scores.reduce((a, b) => a + b, 0) / scores.length
+  // Worst-served player, not the average — one severely-imbalanced person (e.g.
+  // 혼복 9 vs 여복 4) shouldn't get diluted into a neutral score just because
+  // their 3 teammates happen to already be evenly split themselves.
+  return Math.min(...scores)
 }
 
 /**
  * Inverse-scaled sum of pairwise "played together" counts among the 4 candidates.
  * 0 prior meetings among all pairs => 1 (best). Any repeat lowers the score.
+ * Counts a pair's current in-progress game too (via activeGameByPlayer), since
+ * pairHistory only updates once a game ends — otherwise two people mid-game
+ * together would still look like they'd "never played".
  * @param {{id:string, pairHistory: Record<string, number>}[]} group
+ * @param {Map<string, object>} [activeGameByPlayer] from selectors.activeGameByPlayer()
  */
-export function repeatScore(group) {
+export function repeatScore(group, activeGameByPlayer) {
   let sum = 0
   for (let i = 0; i < group.length; i++) {
     for (let j = i + 1; j < group.length; j++) {
-      sum += group[i].pairHistory?.[group[j].id] ?? 0
+      const a = group[i]
+      const b = group[j]
+      sum += a.pairHistory?.[b.id] ?? 0
+      const gameA = activeGameByPlayer?.get(a.id)
+      if (gameA && activeGameByPlayer.get(b.id)?.id === gameA.id) sum += 1
     }
   }
   return 1 / (1 + sum)
