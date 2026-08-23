@@ -20,6 +20,16 @@ function isBusy(player, reservedIds) {
   return player.status === '게임중' || reservedIds.has(player.id)
 }
 
+/**
+ * Same formula as the "N게임" shown on a participant card: completed games plus
+ * the one currently in progress and/or already reserved in the queue. Sorting
+ * must use this, not the raw totalGames field, or "게임 수 적은 순" can visibly
+ * disagree with the number printed on each card.
+ */
+export function effectiveGameCount(player, reserved) {
+  return player.totalGames + (player.status === '게임중' ? 1 : 0) + (reserved ? 1 : 0)
+}
+
 export function filteredParticipants(players, filters, reservedIds = new Set()) {
   let result = players
     .filter((p) => {
@@ -36,7 +46,12 @@ export function filteredParticipants(players, filters, reservedIds = new Set()) 
   // people (not just available ones) is the point, so the operator can see exactly
   // who's most overdue for a game regardless of what they're doing right now.
   if (filters.sortByGameCount) {
-    return result.slice().sort((a, b) => a.totalGames - b.totalGames)
+    return result
+      .slice()
+      .sort(
+        (a, b) =>
+          effectiveGameCount(a, reservedIds.has(a.id)) - effectiveGameCount(b, reservedIds.has(b.id)),
+      )
   }
 
   // Otherwise, available people always float to the top.

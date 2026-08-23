@@ -4,6 +4,7 @@ import { useAppStore } from '../../store/useAppStore'
 import { genderColorClass } from '../../lib/genderColor'
 import { rosterId } from '../../lib/dragIds'
 import { useIsMobile } from '../../hooks/useIsMobile'
+import { effectiveGameCount } from '../../store/selectors'
 import './ParticipantCard.css'
 
 export function ParticipantCard({ player, selected, dimmed, reserved, liveGame }) {
@@ -23,8 +24,7 @@ export function ParticipantCard({ player, selected, dimmed, reserved, liveGame }
   const draggable = selectable && player.status !== '게임중'
   // Counts the game currently in progress and any queued (not-yet-started) game
   // they're already committed to, not just completed ones.
-  const displayedGames =
-    player.totalGames + (player.status === '게임중' ? 1 : 0) + (reserved ? 1 : 0)
+  const displayedGames = effectiveGameCount(player, reserved)
   const byType = { 혼복: 0, 남복: 0, 여복: 0, 즐겜: 0, ...player.gamesByType }
   if (liveGame) byType[liveGame.type] = (byType[liveGame.type] ?? 0) + 1
   // Only the doubles type this player can actually play is worth showing.
