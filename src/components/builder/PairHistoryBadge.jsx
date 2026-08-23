@@ -26,7 +26,11 @@ export function PairHistoryBadge({ selectedPlayers }) {
         {pairs.map(({ a, b, count }) => (
           <div key={`${a.id}-${b.id}`} className="pair-history-item" title={`${a.name} · ${b.name} ${count}회`}>
             {a.name}·{b.name}{' '}
-            <span className={`pair-history-count ${count > 1 ? 'is-high' : ''}`}>{count}회</span>
+            <span
+              className={`pair-history-count ${count === 0 ? 'is-zero' : ''} ${count > 2 ? 'is-high' : ''}`}
+            >
+              {count}회
+            </span>
           </div>
         ))}
       </div>

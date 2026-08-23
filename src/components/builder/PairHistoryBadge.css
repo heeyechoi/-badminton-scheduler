@@ -30,6 +30,10 @@
   color: var(--color-text-tertiary);
 }
 
-.pair-history-count.is-high {
+.pair-history-count.is-zero {
   color: var(--color-warning);
+}
+
+.pair-history-count.is-high {
+  color: var(--color-danger);
 }
