@@ -17,3 +17,18 @@
   display: flex;
   flex-direction: column;
 }
+
+.queue-status-summary {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+}
+
+.queue-status-summary strong {
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.waiting-queue-panel .panel-header .section-title {
+  margin: 0;
+}

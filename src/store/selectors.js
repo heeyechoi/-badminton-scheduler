@@ -1,4 +1,5 @@
-import { gamePlayerIds } from '../lib/courtAssignment'
+import { gamePlayerIds, isGameComplete } from '../lib/courtAssignment'
+import { isUnavailable } from '../lib/playerStatus'
 import { skillIndex } from '../data/skillLevels'
 
 /**
@@ -82,6 +83,25 @@ export function activeGameSignatures(gamesById) {
 
 export function queueGames(queueOrder, gamesById) {
   return queueOrder.map((id) => gamesById[id]).filter(Boolean)
+}
+
+/**
+ * How many queued games are actually ready to take a court right now (complete —
+ * no open seats — and every player free) versus "reserved" (still missing a
+ * player, or blocked because someone's mid-game/resting), matching exactly what
+ * _tryFillCourt looks for.
+ */
+export function queueReadinessCounts(queueOrder, gamesById, players) {
+  const playerById = new Map(players.map((p) => [p.id, p]))
+  let ready = 0
+  for (const gameId of queueOrder) {
+    const game = gamesById[gameId]
+    if (!game) continue
+    if (isGameComplete(game) && gamePlayerIds(game).every((pid) => !isUnavailable(playerById.get(pid)))) {
+      ready++
+    }
+  }
+  return { total: queueOrder.length, ready, reserved: queueOrder.length - ready }
 }
 
 export function playersById(players) {
