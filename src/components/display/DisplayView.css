@@ -5,6 +5,13 @@
   background: var(--color-bg);
 }
 
+@media (max-width: 900px) {
+  .display-shell {
+    height: auto;
+    min-height: 100vh;
+  }
+}
+
 .display-shell-empty {
   align-items: center;
   justify-content: center;
@@ -48,6 +55,29 @@
   color: var(--color-border-strong);
 }
 
+@media (max-width: 900px) {
+  .display-header {
+    height: auto;
+    flex-wrap: wrap;
+    padding: var(--space-3) var(--space-4);
+    gap: var(--space-2);
+  }
+
+  .display-header-title {
+    font-size: 17px;
+  }
+
+  .display-header-timer {
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    font-size: 13px;
+  }
+
+  .display-header-remaining {
+    font-size: 15px;
+  }
+}
+
 .display-main {
   flex: 1;
   display: grid;
@@ -68,6 +98,30 @@
 .display-queue {
   padding: var(--space-5);
   overflow-y: auto;
+}
+
+/* Below this width the side-by-side courts/queue layout no longer fits — stack
+   them into one naturally-scrolling column instead of two cramped, independently
+   scrolling panes, which is much harder to use on a phone or portrait tablet. */
+@media (max-width: 900px) {
+  .display-main {
+    display: flex;
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  .display-courts {
+    overflow-y: visible;
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    padding: var(--space-4);
+  }
+
+  .display-queue {
+    overflow-y: visible;
+    padding: var(--space-4);
+  }
 }
 
 .display-queue-title {
