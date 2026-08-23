@@ -8,6 +8,8 @@ import './Header.css'
 
 export function Header() {
   const session = useAppStore((s) => s.session)
+  const soundEnabled = useAppStore((s) => s.soundEnabled)
+  const setSoundEnabled = useAppStore((s) => s.setSoundEnabled)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [gameLogOpen, setGameLogOpen] = useState(false)
   const now = useNow()
@@ -51,6 +53,15 @@ export function Header() {
         </button>
         <button type="button" className="preview-btn" onClick={() => setGameLogOpen(true)}>
           게임로그 보기
+        </button>
+        <button
+          type="button"
+          className="settings-btn"
+          onClick={() => setSoundEnabled(!soundEnabled)}
+          aria-label={soundEnabled ? '소리 끄기' : '소리 켜기'}
+          title={soundEnabled ? '소리 끄기' : '소리 켜기'}
+        >
+          {soundEnabled ? '🔊' : '🔇'}
         </button>
         <button
           type="button"

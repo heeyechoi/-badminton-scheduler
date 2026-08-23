@@ -74,6 +74,8 @@ export const useAppStore = create(
       theme: { male: null, female: null },
       rejectedSignatures: {},
       toast: null,
+      soundEnabled: true,
+      setSoundEnabled: (enabled) => set({ soundEnabled: enabled }),
 
       initSession: ({ courtCount, skillLevels, durationMinutes }) =>
         set({
@@ -270,7 +272,7 @@ export const useAppStore = create(
             ),
           }))
           const playerNames = selected.map((p) => p.name)
-          playCourtAssignedAnnouncement(freeCourt.number, playerNames)
+          if (get().soundEnabled) playCourtAssignedAnnouncement(freeCourt.number, playerNames)
         } else {
           set((state) => {
             const gamesById = { ...state.gamesById, [game.id]: game }
@@ -398,7 +400,7 @@ export const useAppStore = create(
           ),
         }))
         const playerNames = nextPlayerIds.map((pid) => playerById.get(pid)?.name).filter(Boolean)
-        playCourtAssignedAnnouncement(court.number, playerNames)
+        if (get().soundEnabled) playCourtAssignedAnnouncement(court.number, playerNames)
       },
 
       setCourtDisabled: (courtId, disabled) => {
@@ -615,6 +617,7 @@ export const useAppStore = create(
         targetPlayerIds: state.targetPlayerIds,
         targetModeEnabled: state.targetModeEnabled,
         theme: state.theme,
+        soundEnabled: state.soundEnabled,
       }),
     },
   ),
