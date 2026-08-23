@@ -163,3 +163,42 @@
   font-size: 16px;
   font-weight: 600;
 }
+
+/* Two courts now share a row on phone width, so each card is much narrower —
+   shrink text/padding to fit instead of wrapping awkwardly. */
+@media (max-width: 640px) {
+  .display-court-card {
+    padding: var(--space-2);
+    gap: var(--space-2);
+  }
+
+  .display-court-title {
+    font-size: 15px;
+  }
+
+  .display-court-elapsed {
+    font-size: 13px;
+  }
+
+  .display-court-player {
+    padding: 6px;
+  }
+
+  .display-court-player-name {
+    font-size: 14px;
+  }
+
+  .display-court-player-skill {
+    font-size: 11px;
+  }
+
+  .display-court-player-skill .skill-game-count-skill {
+    font-size: 10px;
+    padding: 1px 6px;
+  }
+
+  .display-court-empty {
+    height: 64px;
+    font-size: 12px;
+  }
+}

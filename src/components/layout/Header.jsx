@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useAppStore } from '../../store/useAppStore'
 import { useNow } from '../../hooks/useElapsedTimer'
-import { formatCountdownKorean, formatElapsed, formatClockTime } from '../../lib/time'
+import { formatCountdownKorean, formatClockTime } from '../../lib/time'
 import { SettingsModal } from './SettingsModal'
 import { GameLogModal } from '../gamelog/GameLogModal'
 import './Header.css'
@@ -23,11 +23,11 @@ export function Header() {
       <div className="app-header-title">🏸 배드민턴 게임 스케줄러</div>
       <div className="app-header-right">
         <div className="session-timer">
-          <div className="session-timer-item">
+          <div className="session-timer-item session-timer-current">
             <span className="session-timer-label">현재</span>
             <span className="session-timer-value">{formatClockTime(now)}</span>
           </div>
-          <span className="session-timer-sep">·</span>
+          <span className="session-timer-sep session-timer-current">·</span>
           <div className="session-timer-item">
             <span className="session-timer-label">종료</span>
             <span className="session-timer-value">
@@ -44,11 +44,6 @@ export function Header() {
             <span className="session-timer-value session-timer-value-primary">
               {formatCountdownKorean(session.startedAt, session.durationMinutes, now)}
             </span>
-          </div>
-          <span className="session-timer-sep">·</span>
-          <div className="session-timer-item">
-            <span className="session-timer-label">경과</span>
-            <span className="session-timer-value">{formatElapsed(session.startedAt, now)}</span>
           </div>
         </div>
         <button type="button" className="preview-btn" onClick={openDisplayView}>

@@ -101,4 +101,10 @@
   .session-timer-item {
     white-space: nowrap;
   }
+
+  /* Current-time-of-day isn't useful on a phone/tablet glance — drop it to
+     save space, keeping 종료/남은 which are the actually actionable numbers. */
+  .session-timer-current {
+    display: none;
+  }
 }

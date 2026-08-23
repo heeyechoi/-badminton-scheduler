@@ -4,15 +4,16 @@ import { Chip } from '../common/Chip'
 import { Button } from '../common/Button'
 import { SKILL_ORDER, SKILL_LABELS } from '../../data/skillLevels'
 import { useAppStore } from '../../store/useAppStore'
+import { formatClockTime } from '../../lib/time'
 import './SetupModal.css'
 
-const DURATION_PRESETS = [60, 90, 120, 150, 180, 210, 240]
+const defaultEndTime = () => formatClockTime(Date.now() + 3 * 60 * 60 * 1000, { withSeconds: false })
 
 export function SetupModal() {
   const initSession = useAppStore((s) => s.initSession)
   const [courtCount, setCourtCount] = useState(6)
   const [skillLevels, setSkillLevels] = useState([...SKILL_ORDER])
-  const [durationMinutes, setDurationMinutes] = useState(180)
+  const [endTime, setEndTime] = useState(defaultEndTime)
 
   const toggleSkill = (skill) => {
     setSkillLevels((prev) =>
@@ -20,7 +21,20 @@ export function SetupModal() {
     )
   }
 
-  const canSubmit = courtCount >= 1 && skillLevels.length > 0 && durationMinutes > 0
+  // Duration is derived from the chosen end time at the moment the user
+  // starts the session (not while picking), since startedAt is set to
+  // Date.now() only when initSession actually runs.
+  const computeDurationMinutes = () => {
+    const [hh, mm] = endTime.split(':').map(Number)
+    if (Number.isNaN(hh) || Number.isNaN(mm)) return 0
+    const now = Date.now()
+    const end = new Date(now)
+    end.setHours(hh, mm, 0, 0)
+    if (end.getTime() <= now) end.setDate(end.getDate() + 1)
+    return Math.round((end.getTime() - now) / 60000)
+  }
+
+  const canSubmit = courtCount >= 1 && skillLevels.length > 0 && /^\d{2}:\d{2}$/.test(endTime)
 
   return (
     <Modal title="운동 설정">
@@ -49,25 +63,20 @@ export function SetupModal() {
       </div>
 
       <div className="setup-field">
-        <label>운동 시간</label>
-        <div className="setup-chip-row">
-          {DURATION_PRESETS.map((minutes) => (
-            <Chip
-              key={minutes}
-              active={durationMinutes === minutes}
-              onClick={() => setDurationMinutes(minutes)}
-            >
-              {minutes >= 60 ? `${minutes / 60}시간${minutes % 60 ? ` ${minutes % 60}분` : ''}` : `${minutes}분`}
-            </Chip>
-          ))}
-        </div>
+        <label>종료 시각</label>
+        <input
+          type="time"
+          className="text-input setup-time-input"
+          value={endTime}
+          onChange={(e) => setEndTime(e.target.value)}
+        />
       </div>
 
       <Button
         variant="primary"
         style={{ width: '100%', marginTop: 8 }}
         disabled={!canSubmit}
-        onClick={() => initSession({ courtCount, skillLevels, durationMinutes })}
+        onClick={() => initSession({ courtCount, skillLevels, durationMinutes: computeDurationMinutes() })}
       >
         시작하기
       </Button>

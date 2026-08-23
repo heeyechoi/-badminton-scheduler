@@ -76,6 +76,12 @@
   .display-header-remaining {
     font-size: 15px;
   }
+
+  /* Current-time-of-day isn't useful on a phone/tablet glance — drop it to
+     save space, keeping 종료/남은 which are the actually actionable numbers. */
+  .display-header-current {
+    display: none;
+  }
 }
 
 .display-main {
@@ -121,6 +127,16 @@
   .display-queue {
     overflow-y: visible;
     padding: var(--space-4);
+  }
+}
+
+/* Phone width: force exactly 2 courts per row instead of the auto-fill min
+   width collapsing to 1 — courts shrink to fit rather than stacking singly. */
+@media (max-width: 640px) {
+  .display-courts {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-2);
+    padding: var(--space-3);
   }
 }
 

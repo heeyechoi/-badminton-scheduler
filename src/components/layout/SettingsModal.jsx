@@ -2,8 +2,10 @@ import { useState } from 'react'
 import { Modal } from '../common/Modal'
 import { Toggle } from '../common/Toggle'
 import { Button } from '../common/Button'
+import { Chip } from '../common/Chip'
 import { useAppStore } from '../../store/useAppStore'
 import { formatClockTime } from '../../lib/time'
+import { SKILL_ORDER, SKILL_LABELS } from '../../data/skillLevels'
 import './SettingsModal.css'
 
 export function SettingsModal({ onClose }) {
@@ -32,6 +34,13 @@ export function SettingsModal({ onClose }) {
 
   const changeDuration = (deltaMinutes) => {
     updateSessionSettings({ durationMinutes: Math.max(10, session.durationMinutes + deltaMinutes) })
+  }
+
+  const toggleSkill = (skill) => {
+    const current = session.skillLevels
+    const next = current.includes(skill) ? current.filter((s) => s !== skill) : [...current, skill]
+    if (next.length === 0) return
+    updateSessionSettings({ skillLevels: next })
   }
 
   const handleEndTimeChange = (e) => {
@@ -84,6 +93,21 @@ export function SettingsModal({ onClose }) {
           <button type="button" onClick={() => changeDuration(10)}>
             +
           </button>
+        </div>
+      </div>
+
+      <div className="setup-field">
+        <label>참여 급수</label>
+        <div className="setup-chip-row">
+          {SKILL_ORDER.map((skill) => (
+            <Chip
+              key={skill}
+              active={session.skillLevels.includes(skill)}
+              onClick={() => toggleSkill(skill)}
+            >
+              {SKILL_LABELS[skill]}
+            </Chip>
+          ))}
         </div>
       </div>
 

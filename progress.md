@@ -1,6 +1,6 @@
 # 배드민턴 게임 스케줄러 — 진행 상황
 
-React + Vite + Zustand 기반 배드민턴 클럽 코트/게임 스케줄러. 원래는 서버 없이 브라우저 localStorage에만 저장하는 구조였고(운영자 한 명이 한 기기에서 조작), 지금은 다른 사람들이 자기 기기에서 실시간으로 "미리보기"를 볼 수 있도록 Firebase 실시간 동기화를 추가하는 작업을 진행 중.
+React + Vite + Zustand 기반 배드민턴 클럽 코트/게임 스케줄러. 원래는 서버 없이 브라우저 localStorage에만 저장하는 구조였고(운영자 한 명이 한 기기에서 조작), 지금은 Firebase Realtime Database 연동으로 다른 사람들이 자기 기기에서 실시간으로 "미리보기"를 볼 수 있다.
 
 **배포 주소**: https://heeyechoi.github.io/-badminton-scheduler/ (GitHub Pages, `main` 브랜치 push 시 GitHub Actions로 자동 빌드·배포)
 
@@ -10,7 +10,7 @@ React + Vite + Zustand 기반 배드민턴 클럽 코트/게임 스케줄러. �
 - **매칭/급수 로직**: `src/lib/matching.js`(추천 후보 생성·스코어링), `src/lib/skill.js`(급수 궁합/밸런스), `src/lib/fairness.js`(공정성·타입 밸런스 등 보조 스코어), `src/lib/gameType.js`, `src/lib/courtAssignment.js`
 - **드래그앤드롭**: `@dnd-kit`, `App.jsx` 최상단 단일 `DndContext` + `src/lib/dragIds.js`의 커스텀 id 스킴(`slot:gameId:teamKey:index`, `builder:index`, `roster:playerId`, 대기열은 정렬용 id)
 - **선수 상태**: `'대기중' | '게임중' | '휴식중'` 세 가지뿐. "예약(대기열에 들어감)"은 별도 상태가 아니라 `reservedPlayerIds(queueOrder, gamesById)`로 매번 파생 계산됨 — 이 설계 원칙을 어기면(즉, 예약 여부를 status로 표현하려고 하면) 버그가 생기기 쉬움(아래 "최근 수정한 버그" 참고)
-- **표시 화면(미리보기)**: `?display=1` 쿼리로 분기되는 읽기 전용 화면(`src/components/display/*`). 지금까지는 `window.addEventListener('storage', ...)` + `persist.rehydrate()`로 "같은 브라우저의 다른 탭"끼리만 동기화됐음 — **다른 기기에서는 안 보임** (localStorage는 기기/브라우저 간 공유 안 됨). 이 한계를 풀기 위해 Firebase Realtime Database 연동을 진행 중(아래 "진행 중인 작업" 참고).
+- **표시 화면(미리보기)**: `?display=1` 쿼리로 분기되는 읽기 전용 화면(`src/components/display/*`). 관리자 화면은 상태가 바뀔 때마다(디바운스 400ms) Firebase Realtime Database(`liveState` 경로)에 `session/players/courts/gamesById/queueOrder`를 쓰고, 미리보기 화면은 `onValue` 구독으로 실시간 반영 — **다른 사람의 폰/PC에서도 미리보기 링크로 그대로 보임**. 같은 브라우저 다른 탭용 `storage` 이벤트 기반 로컬 동기화는 그대로 유지(`src/main.jsx`).
 - **반응형**: 900px 이하는 관리자 화면 전체가 1단 스택 레이아웃(코트 자동 가로 스크롤)으로, 640px 이하(모바일)는 참가자·수동매칭·대기가 하단 탭 3개로 전환(`src/hooks/useIsMobile.js`, `App.jsx`의 `isMobile` 분기). 미리보기 화면도 900px 이하에서 동일하게 스택.
 - **배포**: `vite.config.js`의 `base: '/-badminton-scheduler/'` (GitHub Pages 프로젝트 사이트 경로), `.github/workflows/deploy.yml` (push → build → Pages 배포)
 
@@ -56,6 +56,10 @@ React + Vite + Zustand 기반 배드민턴 클럽 코트/게임 스케줄러. �
 - 코트 배정 시 띵동 소리 + 이름 2회 TTS 안내(직접 배정/대기열 자동 채움 모두)
 - 자강 성별별 강조색, 성별 필터 카드 색상 체계
 - 미리보기(듀얼모니터) 화면에도 관리자 화면과 동일한 팀 구분선 반영, 반응형 적용
+- 미리보기 모바일뷰(≤640px)는 코트 카드가 2열 그리드로 배치되고, 카드 내부 폰트/여백도 그 폭에 맞춰 축소됨(`DisplayView.css`/`DisplayCourtCard.css`)
+- 관리자 헤더·미리보기 헤더 모두 "경과" 표시는 완전히 제거(종료 시각·남은 시간만 표시), 모바일·태블릿(≤900px)에서는 "현재" 시각도 숨김 — 실제로 조작에 쓰이는 종료/남은 시간만 좁은 화면에 남김
+- 운동 시작(`SetupModal`)과 설정(`SettingsModal`) 모두 "운동 시간(분)" 대신 "종료 시각"을 `<input type="time">`으로 입력받고, 그 시각과 `Date.now()`의 차이로 `durationMinutes`를 역산함(시작 시점의 `startedAt`은 여전히 `initSession` 호출 시점의 `Date.now()`)
+- 참여 급수는 설정(`SettingsModal`)에서도 운동 시작 후 언제든 칩으로 토글 수정 가능(최소 1개는 항상 남아있어야 함)
 
 ## 최근 수정한 버그 (중요)
 
@@ -64,9 +68,11 @@ React + Vite + Zustand 기반 배드민턴 클럽 코트/게임 스케줄러. �
 
 **게임 수 적은 순 정렬 불일치**: 위 "참가자 관리" 항목 참고 — `effectiveGameCount()`로 통일해서 수정.
 
-## 진행 중인 작업
+## Firebase 연동 관련 주의사항
 
-**다른 사람이 자기 기기에서 실시간으로 "미리보기"를 볼 수 있게 하기**: 현재 진행 중. 지금까지는 localStorage 기반이라 같은 브라우저의 다른 탭까지만 동기화됐는데, 이걸 넘어서 다른 사람의 폰/PC에서도 실시간으로 보이게 하려면 서버(또는 관리형 실시간 DB)가 필요함을 사용자에게 설명하고, **Firebase Realtime Database**(무료 Spark 요금제)로 진행하기로 합의함. 사용자가 지금 Firebase 콘솔에서 새 프로젝트를 만드는 중 — 완료되면 API 설정값을 받아서 앱에 연동 예정(관리자 화면이 상태를 Firebase에 쓰고, 미리보기 화면은 Firebase를 구독해서 실시간 반영).
+- `src/lib/firebase.js`에 `firebaseConfig`(apiKey 포함)가 커밋되어 있음 — Firebase apiKey는 비밀값이 아니고, 실제 접근 제어는 Realtime Database 규칙(Console → 데이터베이스 및 스토리지 → 규칙)으로 함. 현재 규칙은 `liveState` 경로만 read/write 모두 공개, 나머지는 차단.
+- **초기 로드 시 반드시 즉시 push 필요**: Zustand `persist`가 모듈 임포트 시점에 동기적으로 localStorage를 복원하는데, 이는 `main.jsx`의 `useAppStore.subscribe(...)` 등록보다 먼저 끝나버림. 그래서 구독만 걸어두면 "이미 복원된 초기 상태"는 한 번도 Firebase에 안 올라가고, 이후 진짜 변경이 생겨야만 올라감 — 뷰어가 관리자의 첫 조작 전에 접속하면 빈 화면을 보게 되는 버그였음. `subscribe()` 등록 직후 `pushState(useAppStore.getState())`를 한 번 더 호출해서 해결(`src/main.jsx`).
+- npm에 `firebase` 패키지를 새로 설치한 뒤에는 이미 떠 있던 dev 서버를 **재시작**해야 함(HMR만으로는 안 됨) — 안 하면 콘솔 에러 없이 Firebase 쓰기가 조용히 실패함.
 
 ## 설계 원칙 / 주의사항
 
