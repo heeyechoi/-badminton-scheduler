@@ -8,7 +8,12 @@ import { Chip } from '../common/Chip'
 import { Toggle } from '../common/Toggle'
 import { HamburgerMenu } from '../common/HamburgerMenu'
 import { useAppStore } from '../../store/useAppStore'
-import { filteredParticipants, reservedPlayerIds, activeGameByPlayer } from '../../store/selectors'
+import {
+  filteredParticipants,
+  reservedPlayerIds,
+  activeGameByPlayer,
+  queuedGameByPlayer,
+} from '../../store/selectors'
 import './ParticipantsPanel.css'
 
 export function ParticipantsPanel() {
@@ -25,6 +30,7 @@ export function ParticipantsPanel() {
   const reservedIds = reservedPlayerIds(queueOrder, gamesById)
   const visible = filteredParticipants(players, filters, reservedIds)
   const liveGames = activeGameByPlayer(gamesById)
+  const queuedGames = queuedGameByPlayer(queueOrder, gamesById)
 
   const selectGender = (gender) => {
     setFilters({ genders: gender === null ? [] : [gender] })
@@ -57,7 +63,7 @@ export function ParticipantsPanel() {
         </div>
         <div className="panel-header-actions">
           <Toggle
-            label="게임중인 사람 가리기"
+            label="매칭가능한 선수만"
             checked={filters.hideInGame}
             onChange={(v) => setFilters({ hideInGame: v })}
           />
@@ -88,6 +94,7 @@ export function ParticipantsPanel() {
             reserved={reservedIds.has(player.id)}
             dimmed={filters.hideInGame && (player.status === '게임중' || reservedIds.has(player.id))}
             liveGame={liveGames.get(player.id)}
+            queuedGame={queuedGames.get(player.id)}
           />
         ))}
       </div>

@@ -7,7 +7,7 @@ import { useIsMobile } from '../../hooks/useIsMobile'
 import { effectiveGameCount } from '../../store/selectors'
 import './ParticipantCard.css'
 
-export function ParticipantCard({ player, selected, dimmed, reserved, liveGame }) {
+export function ParticipantCard({ player, selected, dimmed, reserved, liveGame, queuedGame }) {
   const toggleBuilderSelect = useAppStore((s) => s.toggleBuilderSelect)
   const togglePlayerRest = useAppStore((s) => s.togglePlayerRest)
   // Game count sits inline with name/skill only on mobile, to keep the card
@@ -27,6 +27,7 @@ export function ParticipantCard({ player, selected, dimmed, reserved, liveGame }
   const displayedGames = effectiveGameCount(player, reserved)
   const byType = { 혼복: 0, 남복: 0, 여복: 0, 즐겜: 0, ...player.gamesByType }
   if (liveGame) byType[liveGame.type] = (byType[liveGame.type] ?? 0) + 1
+  if (queuedGame) byType[queuedGame.type] = (byType[queuedGame.type] ?? 0) + 1
   // Only the doubles type this player can actually play is worth showing.
   const sameGenderType = player.gender === '남' ? '남복' : '여복'
   const sameGenderLabel = player.gender === '남' ? '남' : '여'

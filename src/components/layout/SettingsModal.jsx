@@ -123,7 +123,7 @@ export function SettingsModal({ onClose }) {
 
       <div className="setup-field settings-toggle-field">
         <Toggle
-          label="'이 사람과 모두 게임하도록' 기능 사용"
+          label="'이 선수와 모두 게임하도록' 기능 사용"
           checked={targetModeEnabled}
           onChange={setTargetModeEnabled}
         />

@@ -608,7 +608,7 @@ export const useAppStore = create(
         courts: state.courts,
         gamesById: state.gamesById,
         queueOrder: state.queueOrder,
-        // "이 사람과 모두 게임하도록" tracks progress across the whole session,
+        // "이 선수와 모두 게임하도록" tracks progress across the whole session,
         // so it must survive a page reload, not just live in memory.
         targetPlayerIds: state.targetPlayerIds,
         targetModeEnabled: state.targetModeEnabled,

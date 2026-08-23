@@ -31,7 +31,7 @@ export function UnplayedWithTargetList() {
       ) : (
         <>
           <p className="unplayed-title">
-            {targetNames}님과 아직 게임 안 한 사람 ({remaining.length}명)
+            {targetNames}님과 아직 게임 안 한 선수 ({remaining.length}명)
           </p>
           <div className="unplayed-chips">
             {remaining.map((p) => {

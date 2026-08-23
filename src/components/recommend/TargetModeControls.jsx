@@ -19,14 +19,14 @@ export function TargetModeControls() {
 
   return (
     <div className="target-mode">
-      <label className="target-mode-label">이 사람과 모두 게임하도록 (여러 명 선택 가능)</label>
+      <label className="target-mode-label">이 선수와 모두 게임하도록 (여러 명 선택 가능)</label>
       <div className="target-mode-row">
         <select
           className="text-input"
           value=""
           onChange={(e) => e.target.value && toggleTargetPlayer(e.target.value)}
         >
-          <option value="">추가할 사람 선택</option>
+          <option value="">추가할 선수 선택</option>
           {selectable.map((p) => (
             <option key={p.id} value={p.id}>
               {p.name} ({p.skill})
