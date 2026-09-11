@@ -4,7 +4,7 @@ import { Toggle } from '../common/Toggle'
 import { Button } from '../common/Button'
 import { Chip } from '../common/Chip'
 import { useAppStore } from '../../store/useAppStore'
-import { formatClockTime } from '../../lib/time'
+import { toDatetimeLocalValue, fromDatetimeLocalValue } from '../../lib/time'
 import { SKILL_ORDER, SKILL_LABELS } from '../../data/skillLevels'
 import './SettingsModal.css'
 
@@ -24,16 +24,13 @@ export function SettingsModal({ onClose }) {
   const [courtError, setCourtError] = useState('')
 
   const endsAt = session.startedAt + session.durationMinutes * 60 * 1000
-  const endTimeValue = formatClockTime(endsAt, { withSeconds: false })
+  const startValue = toDatetimeLocalValue(session.startedAt)
+  const endValue = toDatetimeLocalValue(endsAt)
 
   const changeCourtCount = (delta) => {
     const next = Math.max(1, courts.length + delta)
     const ok = setCourtCount(next)
     setCourtError(ok ? '' : '사용 중인 코트가 있어 그만큼 줄일 수 없습니다.')
-  }
-
-  const changeDuration = (deltaMinutes) => {
-    updateSessionSettings({ durationMinutes: Math.max(10, session.durationMinutes + deltaMinutes) })
   }
 
   const toggleSkill = (skill) => {
@@ -43,14 +40,20 @@ export function SettingsModal({ onClose }) {
     updateSessionSettings({ skillLevels: next })
   }
 
-  const handleEndTimeChange = (e) => {
-    const [hh, mm] = e.target.value.split(':').map(Number)
-    if (Number.isNaN(hh) || Number.isNaN(mm)) return
-    const end = new Date(session.startedAt)
-    end.setHours(hh, mm, 0, 0)
-    if (end.getTime() <= session.startedAt) end.setDate(end.getDate() + 1)
-    const newDuration = Math.round((end.getTime() - session.startedAt) / 60000)
-    updateSessionSettings({ durationMinutes: newDuration })
+  const handleStartChange = (e) => {
+    const newStart = fromDatetimeLocalValue(e.target.value)
+    if (newStart == null) return
+    // Keep the current end time fixed and let duration absorb the shift, so
+    // dragging the start earlier/later doesn't also silently move the end.
+    const newDuration = Math.round((endsAt - newStart) / 60000)
+    updateSessionSettings({ startedAt: newStart, durationMinutes: Math.max(1, newDuration) })
+  }
+
+  const handleEndChange = (e) => {
+    const newEnd = fromDatetimeLocalValue(e.target.value)
+    if (newEnd == null) return
+    const newDuration = Math.round((newEnd - session.startedAt) / 60000)
+    updateSessionSettings({ durationMinutes: Math.max(1, newDuration) })
   }
 
   const handleResetSession = () => {
@@ -84,16 +87,13 @@ export function SettingsModal({ onClose }) {
       </div>
 
       <div className="setup-field">
-        <label>운동 진행 시간</label>
-        <div className="setup-stepper">
-          <button type="button" onClick={() => changeDuration(-10)}>
-            −
-          </button>
-          <span>{session.durationMinutes}분</span>
-          <button type="button" onClick={() => changeDuration(10)}>
-            +
-          </button>
-        </div>
+        <label>시작 일시</label>
+        <input
+          type="datetime-local"
+          className="text-input settings-time-input"
+          value={startValue}
+          onChange={handleStartChange}
+        />
       </div>
 
       <div className="setup-field">
@@ -112,12 +112,12 @@ export function SettingsModal({ onClose }) {
       </div>
 
       <div className="setup-field">
-        <label>종료 시각</label>
+        <label>종료 일시</label>
         <input
-          type="time"
+          type="datetime-local"
           className="text-input settings-time-input"
-          value={endTimeValue}
-          onChange={handleEndTimeChange}
+          value={endValue}
+          onChange={handleEndChange}
         />
       </div>
 

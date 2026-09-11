@@ -12,8 +12,14 @@ export function Header() {
   const setSoundEnabled = useAppStore((s) => s.setSoundEnabled)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [gameLogOpen, setGameLogOpen] = useState(false)
-  const [linkCopied, setLinkCopied] = useState(false)
+  const [copiedKind, setCopiedKind] = useState(null) // 'admin' | 'viewer' | null
   const now = useNow()
+
+  const getAdminUrl = () => {
+    const url = new URL(window.location.href)
+    url.search = ''
+    return url.toString()
+  }
 
   const getDisplayUrl = () => {
     const url = new URL(window.location.href)
@@ -25,16 +31,16 @@ export function Header() {
     window.open(getDisplayUrl(), '_blank')
   }
 
-  const copyDisplayLink = async () => {
-    const url = getDisplayUrl()
+  const copyLink = async (kind) => {
+    const url = kind === 'admin' ? getAdminUrl() : getDisplayUrl()
     try {
       await navigator.clipboard.writeText(url)
     } catch {
       window.prompt('아래 링크를 복사하세요', url)
       return
     }
-    setLinkCopied(true)
-    setTimeout(() => setLinkCopied(false), 1500)
+    setCopiedKind(kind)
+    setTimeout(() => setCopiedKind((k) => (k === kind ? null : k)), 1500)
   }
 
   return (
@@ -63,13 +69,19 @@ export function Header() {
             <span className="session-timer-value session-timer-value-primary">
               {formatCountdownKorean(session.startedAt, session.durationMinutes, now)}
             </span>
+            {session.startedAt && now < session.startedAt && (
+              <span className="session-timer-note">시작 전</span>
+            )}
           </div>
         </div>
         <button type="button" className="preview-btn" onClick={openDisplayView}>
           미리보기
         </button>
-        <button type="button" className="preview-btn" onClick={copyDisplayLink}>
-          {linkCopied ? '복사됨!' : '🔗 링크 복사'}
+        <button type="button" className="preview-btn" onClick={() => copyLink('admin')}>
+          {copiedKind === 'admin' ? '복사됨!' : '🔗 관리자 링크 복사'}
+        </button>
+        <button type="button" className="preview-btn" onClick={() => copyLink('viewer')}>
+          {copiedKind === 'viewer' ? '복사됨!' : '🔗 참여자 링크 복사'}
         </button>
         <button type="button" className="preview-btn" onClick={() => setGameLogOpen(true)}>
           게임로그 보기

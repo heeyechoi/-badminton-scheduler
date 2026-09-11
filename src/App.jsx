@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { DndContext, PointerSensor, closestCenter, useSensor, useSensors } from '@dnd-kit/core'
 import { arrayMove } from '@dnd-kit/sortable'
 import { Header } from './components/layout/Header'
+import { Landing } from './components/layout/Landing'
 import { SetupModal } from './components/layout/SetupModal'
 import { CourtBoard } from './components/courts/CourtBoard'
 import { ParticipantsPanel } from './components/participants/ParticipantsPanel'
@@ -22,6 +23,7 @@ const MOBILE_TABS = [
 
 export default function App() {
   const sessionStarted = useAppStore((s) => Boolean(s.session.startedAt))
+  const [wantsToCreate, setWantsToCreate] = useState(false)
   const isMobile = useIsMobile(640)
   const [mobileTab, setMobileTab] = useState('participants')
   const gamesById = useAppStore((s) => s.gamesById)
@@ -60,7 +62,7 @@ export default function App() {
   }, [theme])
 
   if (!sessionStarted) {
-    return <SetupModal />
+    return wantsToCreate ? <SetupModal /> : <Landing onCreate={() => setWantsToCreate(true)} />
   }
 
   const handleDragEnd = (event) => {

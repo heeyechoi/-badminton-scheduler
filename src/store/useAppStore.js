@@ -77,9 +77,9 @@ export const useAppStore = create(
       soundEnabled: true,
       setSoundEnabled: (enabled) => set({ soundEnabled: enabled }),
 
-      initSession: ({ courtCount, skillLevels, durationMinutes }) =>
+      initSession: ({ courtCount, skillLevels, durationMinutes, startAt }) =>
         set({
-          session: { courtCount, skillLevels, durationMinutes, startedAt: Date.now() },
+          session: { courtCount, skillLevels, durationMinutes, startedAt: startAt ?? Date.now() },
           courts: makeCourts(courtCount),
         }),
 

@@ -4,16 +4,18 @@ import { Chip } from '../common/Chip'
 import { Button } from '../common/Button'
 import { SKILL_ORDER, SKILL_LABELS } from '../../data/skillLevels'
 import { useAppStore } from '../../store/useAppStore'
-import { formatClockTime } from '../../lib/time'
+import { toDatetimeLocalValue, fromDatetimeLocalValue } from '../../lib/time'
 import './SetupModal.css'
 
-const defaultEndTime = () => formatClockTime(Date.now() + 3 * 60 * 60 * 1000, { withSeconds: false })
+const defaultStartValue = () => toDatetimeLocalValue(Date.now())
+const defaultEndValue = () => toDatetimeLocalValue(Date.now() + 3 * 60 * 60 * 1000)
 
 export function SetupModal() {
   const initSession = useAppStore((s) => s.initSession)
   const [courtCount, setCourtCount] = useState(6)
   const [skillLevels, setSkillLevels] = useState([...SKILL_ORDER])
-  const [endTime, setEndTime] = useState(defaultEndTime)
+  const [startValue, setStartValue] = useState(defaultStartValue)
+  const [endValue, setEndValue] = useState(defaultEndValue)
 
   const toggleSkill = (skill) => {
     setSkillLevels((prev) =>
@@ -21,20 +23,15 @@ export function SetupModal() {
     )
   }
 
-  // Duration is derived from the chosen end time at the moment the user
-  // starts the session (not while picking), since startedAt is set to
-  // Date.now() only when initSession actually runs.
-  const computeDurationMinutes = () => {
-    const [hh, mm] = endTime.split(':').map(Number)
-    if (Number.isNaN(hh) || Number.isNaN(mm)) return 0
-    const now = Date.now()
-    const end = new Date(now)
-    end.setHours(hh, mm, 0, 0)
-    if (end.getTime() <= now) end.setDate(end.getDate() + 1)
-    return Math.round((end.getTime() - now) / 60000)
-  }
+  const startAt = fromDatetimeLocalValue(startValue)
+  const endAt = fromDatetimeLocalValue(endValue)
 
-  const canSubmit = courtCount >= 1 && skillLevels.length > 0 && /^\d{2}:\d{2}$/.test(endTime)
+  const canSubmit =
+    courtCount >= 1 &&
+    skillLevels.length > 0 &&
+    startAt != null &&
+    endAt != null &&
+    endAt > startAt
 
   return (
     <Modal title="운동 설정">
@@ -63,12 +60,22 @@ export function SetupModal() {
       </div>
 
       <div className="setup-field">
-        <label>종료 시각</label>
+        <label>시작 일시</label>
         <input
-          type="time"
+          type="datetime-local"
           className="text-input setup-time-input"
-          value={endTime}
-          onChange={(e) => setEndTime(e.target.value)}
+          value={startValue}
+          onChange={(e) => setStartValue(e.target.value)}
+        />
+      </div>
+
+      <div className="setup-field">
+        <label>종료 일시</label>
+        <input
+          type="datetime-local"
+          className="text-input setup-time-input"
+          value={endValue}
+          onChange={(e) => setEndValue(e.target.value)}
         />
       </div>
 
@@ -76,7 +83,14 @@ export function SetupModal() {
         variant="primary"
         style={{ width: '100%', marginTop: 8 }}
         disabled={!canSubmit}
-        onClick={() => initSession({ courtCount, skillLevels, durationMinutes: computeDurationMinutes() })}
+        onClick={() =>
+          initSession({
+            courtCount,
+            skillLevels,
+            startAt,
+            durationMinutes: Math.round((endAt - startAt) / 60000),
+          })
+        }
       >
         시작하기
       </Button>

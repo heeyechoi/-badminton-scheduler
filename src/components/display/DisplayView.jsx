@@ -41,6 +41,7 @@ export function DisplayView() {
           <span className="display-header-sep">·</span>
           <span className="display-header-remaining">
             남은 {formatCountdownKorean(session.startedAt, session.durationMinutes, now)}
+            {now < session.startedAt && ' (시작 전)'}
           </span>
         </div>
       </header>
