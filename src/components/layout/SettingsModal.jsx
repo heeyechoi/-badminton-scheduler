@@ -143,7 +143,7 @@ export function SettingsModal({ onClose }) {
             <input
               type="color"
               className="settings-color-swatch"
-              value={theme.male ?? '#38bdf8'}
+              value={theme.male ?? '#7597cc'}
               onChange={(e) => setThemeColor('male', e.target.value)}
             />
             <span>남자</span>
@@ -152,7 +152,7 @@ export function SettingsModal({ onClose }) {
             <input
               type="color"
               className="settings-color-swatch"
-              value={theme.female ?? '#f472b6'}
+              value={theme.female ?? '#ff9999'}
               onChange={(e) => setThemeColor('female', e.target.value)}
             />
             <span>여자</span>
