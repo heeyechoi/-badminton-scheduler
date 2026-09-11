@@ -1,6 +1,6 @@
 # 배드민턴 게임 스케줄러 — 진행 상황
 
-React + Vite + Zustand 기반 배드민턴 클럽 코트/게임 스케줄러. 원래는 서버 없이 브라우저 localStorage에만 저장하는 구조였고(운영자 한 명이 한 기기에서 조작), 지금은 Firebase Realtime Database 연동으로 다른 사람들이 자기 기기에서 실시간으로 "미리보기"를 볼 수 있다.
+React + Vite + Zustand 기반 배드민턴 클럽 코트/게임 스케줄러. 원래는 서버 없이 브라우저 localStorage에만 저장하는 구조였고(운영자 한 명이 한 기기에서 조작), 지금은 Firebase Realtime Database 연동으로 다른 사람들이 자기 기기에서 실시간으로 "미리보기"를 볼 수 있고, 관리자 화면도 같은 경로로 양방향 동기화되어 같은 관리자 링크를 여러 기기에서 동시에 열어 조작할 수 있다.
 
 **배포 주소**: https://heeyechoi.github.io/-badminton-scheduler/ (GitHub Pages, `main` 브랜치 push 시 GitHub Actions로 자동 빌드·배포)
 
@@ -10,7 +10,8 @@ React + Vite + Zustand 기반 배드민턴 클럽 코트/게임 스케줄러. �
 - **매칭/급수 로직**: `src/lib/matching.js`(추천 후보 생성·스코어링), `src/lib/skill.js`(급수 궁합/밸런스), `src/lib/fairness.js`(공정성·타입 밸런스 등 보조 스코어), `src/lib/gameType.js`, `src/lib/courtAssignment.js`
 - **드래그앤드롭**: `@dnd-kit`, `App.jsx` 최상단 단일 `DndContext` + `src/lib/dragIds.js`의 커스텀 id 스킴(`slot:gameId:teamKey:index`, `builder:index`, `roster:playerId`, 대기열은 정렬용 id)
 - **선수 상태**: `'대기중' | '게임중' | '휴식중'` 세 가지뿐. "예약(대기열에 들어감)"은 별도 상태가 아니라 `reservedPlayerIds(queueOrder, gamesById)`로 매번 파생 계산됨 — 이 설계 원칙을 어기면(즉, 예약 여부를 status로 표현하려고 하면) 버그가 생기기 쉬움(아래 "최근 수정한 버그" 참고)
-- **표시 화면(미리보기)**: `?display=1` 쿼리로 분기되는 읽기 전용 화면(`src/components/display/*`). 관리자 화면은 상태가 바뀔 때마다(디바운스 400ms) Firebase Realtime Database(`liveState` 경로)에 `session/players/courts/gamesById/queueOrder`를 쓰고, 미리보기 화면은 `onValue` 구독으로 실시간 반영 — **다른 사람의 폰/PC에서도 미리보기 링크로 그대로 보임**. 같은 브라우저 다른 탭용 `storage` 이벤트 기반 로컬 동기화는 그대로 유지(`src/main.jsx`).
+- **표시 화면(미리보기)**: `?display=1` 쿼리로 분기되는 읽기 전용 화면(`src/components/display/*`). `onValue` 구독으로 Firebase Realtime Database(`liveState` 경로)를 실시간 반영만 함(쓰기 없음) — **다른 사람의 폰/PC에서도 미리보기 링크로 그대로 보임**. 헤더의 "🔗 링크 복사" 버튼(`Header.jsx`)으로 이 링크를 클립보드에 복사할 수 있음(클립보드 API 실패 시 `window.prompt` 폴백).
+- **관리자 화면(다중 기기 동시 조작)**: 관리자(`?display=1` 없는 주소)도 이제 `liveState`를 양방향으로 씀 — 상태가 바뀔 때마다(디바운스 400ms) push하고, 동시에 `onValue`로 구독해서 다른 기기에서 온 변경도 반영함(`src/main.jsx`). 그래서 **같은 관리자 링크를 여러 기기에서 열어도 같은 게임판을 보며 조작**할 수 있음. 원격에서 받은 상태를 적용하는 동안(`applyingRemote` 플래그) 그 변경을 다시 Firebase로 되쏘지 않도록 막아서 무한 핑퐁을 방지함 — 이 플래그 없이 구현하면 반드시 재발하는 버그이니 이 패턴을 건드릴 땐 주의. 다만 **진짜 동시(같은 400ms 창 안) 편집에 대한 병합/락은 없음 — 마지막에 push한 쪽이 이김**(last-write-wins). Firebase에 아직 아무 데이터가 없을 때만(`hasReceivedSnapshot`이 false일 때) 이 기기의 localStorage 상태로 시딩(seed)함 — 그 외엔 기존 라이브 상태가 이 기기의 로컬 캐시를 덮어씀. 같은 브라우저 다른 탭용 `storage` 이벤트 기반 로컬 동기화는 그대로 유지(`src/main.jsx`) — 지금은 Firebase가 이미 다 커버하므로 사실상 중복이지만 제거하지는 않음.
 - **반응형**: 900px 이하는 관리자 화면 전체가 1단 스택 레이아웃(코트 자동 가로 스크롤)으로, 640px 이하(모바일)는 참가자·수동매칭·대기가 하단 탭 3개로 전환(`src/hooks/useIsMobile.js`, `App.jsx`의 `isMobile` 분기). 미리보기 화면도 900px 이하에서 동일하게 스택.
 - **배포**: `vite.config.js`의 `base: '/-badminton-scheduler/'` (GitHub Pages 프로젝트 사이트 경로), `.github/workflows/deploy.yml` (push → build → Pages 배포)
 

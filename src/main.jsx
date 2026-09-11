@@ -32,8 +32,10 @@ if (isDisplay) {
     (err) => console.error('Firebase live-state read failed:', err),
   )
 } else {
-  // Admin tab pushes the parts a viewer needs any time they change, debounced
-  // so a burst of edits (e.g. dragging) doesn't spam the database.
+  // Admin tabs sync bidirectionally through the same liveState path, so the
+  // same admin link can be opened from multiple devices at once and they all
+  // converge on the same board (last write still wins on true simultaneous
+  // edits — there's no merge/lock, just push-and-pull through one path).
   const pushState = (state) =>
     set(liveStateRef, {
       session: state.session,
@@ -43,16 +45,38 @@ if (isDisplay) {
       queueOrder: state.queueOrder,
     }).catch((err) => console.error('Firebase live-state push failed:', err))
 
+  // Guards against echoing a just-received remote update straight back to
+  // Firebase, which would otherwise ping-pong between the two writes.
+  let applyingRemote = false
   let pushTimer = null
+  let hasReceivedSnapshot = false
+
   useAppStore.subscribe((state) => {
+    if (applyingRemote) return
     clearTimeout(pushTimer)
     pushTimer = setTimeout(() => pushState(state), 400)
   })
-  // The store's persist middleware hydrates from localStorage synchronously
-  // during module init, before this subscribe() call above even registers —
-  // so without this, a viewer opening before the admin's first edit would see
-  // nothing (or stale data) until something actually changes.
-  pushState(useAppStore.getState())
+
+  onValue(
+    liveStateRef,
+    (snapshot) => {
+      const data = snapshot.val()
+      if (data) {
+        applyingRemote = true
+        useAppStore.setState(data)
+        applyingRemote = false
+      } else if (!hasReceivedSnapshot) {
+        // Nobody has a session running yet — seed Firebase from whatever this
+        // admin's localStorage last had (same reasoning as the old unconditional
+        // push: the store's persist middleware hydrates synchronously during
+        // module init, before this subscription even registers, so without this
+        // a viewer opening before any edit would see nothing).
+        pushState(useAppStore.getState())
+      }
+      hasReceivedSnapshot = true
+    },
+    (err) => console.error('Firebase live-state read failed:', err),
+  )
 }
 
 createRoot(document.getElementById('root')).render(
