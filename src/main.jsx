@@ -43,6 +43,7 @@ if (isDisplay) {
       courts: state.courts,
       gamesById: state.gamesById,
       queueOrder: state.queueOrder,
+      announcement: state.announcement,
     }).catch((err) => console.error('Firebase live-state push failed:', err))
 
   // Guards against echoing a just-received remote update straight back to

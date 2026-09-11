@@ -35,7 +35,10 @@
 
 .participant-card-main {
   display: flex;
-  align-items: center;
+  /* flex-start (not center) so a 2-line name (long/foreign names) keeps the
+     skill badge lined up with the name's first line instead of floating to
+     the vertical middle of the whole 2-line block. */
+  align-items: flex-start;
   gap: 7px;
 }
 
@@ -58,6 +61,8 @@
   padding: 4px 9px;
   border-radius: var(--radius-pill);
   box-shadow: var(--shadow-sm);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .participant-card.gender-male .participant-card-skill {

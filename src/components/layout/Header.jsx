@@ -3,6 +3,7 @@ import { useAppStore } from '../../store/useAppStore'
 import { useNow } from '../../hooks/useElapsedTimer'
 import { formatCountdownKorean, formatClockTime } from '../../lib/time'
 import { SettingsModal } from './SettingsModal'
+import { AnnouncementModal } from './AnnouncementModal'
 import { GameLogModal } from '../gamelog/GameLogModal'
 import './Header.css'
 
@@ -10,8 +11,10 @@ export function Header() {
   const session = useAppStore((s) => s.session)
   const soundEnabled = useAppStore((s) => s.soundEnabled)
   const setSoundEnabled = useAppStore((s) => s.setSoundEnabled)
+  const announcement = useAppStore((s) => s.announcement)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [gameLogOpen, setGameLogOpen] = useState(false)
+  const [announcementOpen, setAnnouncementOpen] = useState(false)
   const [copiedKind, setCopiedKind] = useState(null) // 'admin' | 'viewer' | null
   const now = useNow()
 
@@ -89,6 +92,15 @@ export function Header() {
         </button>
         <button
           type="button"
+          className={`settings-btn ${announcement ? 'has-announcement' : ''}`}
+          onClick={() => setAnnouncementOpen(true)}
+          aria-label="공지사항"
+          title={announcement ? `공지사항: ${announcement}` : '공지사항'}
+        >
+          💬
+        </button>
+        <button
+          type="button"
           className="settings-btn"
           onClick={() => setSoundEnabled(!soundEnabled)}
           aria-label={soundEnabled ? '소리 끄기' : '소리 켜기'}
@@ -107,6 +119,7 @@ export function Header() {
       </div>
       {settingsOpen && <SettingsModal onClose={() => setSettingsOpen(false)} />}
       {gameLogOpen && <GameLogModal onClose={() => setGameLogOpen(false)} />}
+      {announcementOpen && <AnnouncementModal onClose={() => setAnnouncementOpen(false)} />}
     </header>
   )
 }

@@ -1,0 +1,11 @@
+.announcement-textarea {
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+}
+
+.announcement-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}

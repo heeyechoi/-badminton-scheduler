@@ -12,14 +12,23 @@ export function DisplayView() {
   const gamesById = useAppStore((s) => s.gamesById)
   const queueOrder = useAppStore((s) => s.queueOrder)
   const players = useAppStore((s) => s.players)
+  const announcement = useAppStore((s) => s.announcement)
   const now = useNow()
 
   const map = buildPlayersById(players)
   const games = queueGames(queueOrder, gamesById)
 
+  const announcementBanner = announcement && (
+    <div className="display-announcement">
+      <span className="display-announcement-icon">📢</span>
+      <span className="display-announcement-text">{announcement}</span>
+    </div>
+  )
+
   if (!session.startedAt) {
     return (
       <div className="display-shell display-shell-empty">
+        {announcementBanner}
         <p>세션이 아직 시작되지 않았습니다.</p>
       </div>
     )
@@ -27,6 +36,7 @@ export function DisplayView() {
 
   return (
     <div className="display-shell">
+      {announcementBanner}
       <header className="display-header">
         <div className="display-header-title">🏸 배드민턴 게임 스케줄러</div>
         <div className="display-header-timer">

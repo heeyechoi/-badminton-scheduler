@@ -84,6 +84,13 @@
   font-size: 16px;
 }
 
+/* Marks that an announcement is currently set, so the admin doesn't have to
+   open the modal just to check whether one is live. */
+.settings-btn.has-announcement {
+  background: var(--color-primary-bg);
+  box-shadow: 0 0 0 2px var(--color-primary) inset;
+}
+
 @media (max-width: 900px) {
   .app-header {
     height: auto;

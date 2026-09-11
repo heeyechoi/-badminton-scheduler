@@ -76,6 +76,10 @@ export const useAppStore = create(
       toast: null,
       soundEnabled: true,
       setSoundEnabled: (enabled) => set({ soundEnabled: enabled }),
+      // Shown as a banner at the top of the participant/preview screen — synced
+      // to viewers the same way courts/queue are (see main.jsx's push list).
+      announcement: '',
+      setAnnouncement: (text) => set({ announcement: text }),
 
       initSession: ({ courtCount, skillLevels, durationMinutes, startAt }) =>
         set({
@@ -602,6 +606,7 @@ export const useAppStore = create(
           builderType: '혼복',
           targetPlayerIds: [],
           rejectedSignatures: {},
+          announcement: '',
         }),
     }),
     {
@@ -618,6 +623,7 @@ export const useAppStore = create(
         targetModeEnabled: state.targetModeEnabled,
         theme: state.theme,
         soundEnabled: state.soundEnabled,
+        announcement: state.announcement,
       }),
     },
   ),
