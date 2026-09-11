@@ -1,4 +1,4 @@
-export const SKILL_ORDER = ['자강', 'A', 'B', 'C', 'D', 'E', 'F']
+export const SKILL_ORDER = ['자강', 'A', 'B', 'C', 'D', 'E', 'F', '비동호인']
 
 export const SKILL_LABELS = {
   자강: '자강',
@@ -8,6 +8,7 @@ export const SKILL_LABELS = {
   D: 'D',
   E: 'E (초심)',
   F: 'F (왕초심)',
+  비동호인: '비동호인',
 }
 
 // '즐겜' is a flexible fallback type the recommendation engine can produce for

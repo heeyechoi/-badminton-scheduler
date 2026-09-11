@@ -43,6 +43,7 @@ React + Vite + Zustand 기반 배드민턴 클럽 코트/게임 스케줄러. �
 
 ### 추천 매칭 스코어링 (`src/lib/matching.js`, `src/lib/fairness.js`, `src/lib/skill.js`)
 가중합 스코어: `skill(0.35) + fairness(0.15) + ratio(0.15) + repeat(0.15) + typeBalance(0.2)`, 그 위에 아래 배율(penalty/boost)이 곱해짐.
+- **급수 목록**: `src/data/skillLevels.js`의 `SKILL_ORDER = ['자강','A','B','C','D','E','F','비동호인']`(강한 순). `비동호인`은 F보다 더 아래의 최하위 급수로 추가됨 — `src/lib/skill.js`의 `SKILL_POSITION`에 `F:7` 다음 `비동호인:8`로 이어붙여서 초심 밴드(`BAND_SPLIT`, idx≥5) 안에서 기존 E/F와 동일한 규칙(여성 +1 보정, 즐겜 extremity 페널티 등)을 그대로 적용받게 함 — 새 급수를 추가할 땐 이 두 파일(순서 배열 + 포지션 숫자)만 건드리면 됨, 나머지 화면(참가자 추가/필터/엑셀 등)은 전부 `SKILL_ORDER`를 순회하므로 자동 반영됨
 - **급수 궁합**: 자강↔A 간격을 넓게 잡은 밴드 모델, 여성은 +1 포지션 보정(예: 남D ≈ 여C, 자강은 예외), "밸런스 상"은 skillScore ≥ 0.9일 때만
 - **여자자강 예외**: 3남+1여(자강) 조합은 남복으로 인정(`deriveGameType`/`deriveManualGameType`)하고 성비 페널티도 면제 — 자강 여성은 스킬상 남자A보다 세다는 전제
 - **팀 분배 불균형 페널티**: `balancedTeamSplit`이 반환하는 최선의 팀 갭(gap)이 크면 추가 페널티 — 그룹 전체 스킬점수만으론 "자강+약한 파트너 vs 애매한 페어" 같은 조합의 실제 불균형을 못 잡아서 추가함

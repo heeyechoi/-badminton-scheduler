@@ -5,7 +5,7 @@ const BAND_SPLIT = 5 // idx < 5 (자강,A,B,C,D) = competitive band, idx >= 5 (E
 // Quality-scoring positions (distinct from plain ladder order): 자강 is much
 // stronger than A specifically, not just "one tier up" like every other step,
 // so its gap to A is widened while A→B→C→D→E→F stay evenly spaced.
-const SKILL_POSITION = { 자강: 0, A: 2, B: 3, C: 4, D: 5, E: 6, F: 7 }
+const SKILL_POSITION = { 자강: 0, A: 2, B: 3, C: 4, D: 5, E: 6, F: 7, 비동호인: 8 }
 // At the same nominal label, men skew stronger than women (e.g. 남D ≈ 여C) —
 // 자강 is exempt since it already denotes an exceptional tier for either gender.
 const FEMALE_SKILL_PENALTY = 1
