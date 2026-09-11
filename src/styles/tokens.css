@@ -23,6 +23,14 @@
   --color-female-bg: #fde6f1;
   --color-female-bg-dim: #fef0f6;
 
+  /* 비동호인(non-member): one tone darker than whichever male/female color is
+     currently set (including a custom color from SettingsModal), not a fixed
+     palette like 자강 — derived via color-mix so it always tracks the base color. */
+  --color-male-nonmember: color-mix(in srgb, var(--color-male) 78%, black);
+  --color-male-nonmember-bg: color-mix(in srgb, var(--color-male-bg) 85%, black);
+  --color-female-nonmember: color-mix(in srgb, var(--color-female) 78%, black);
+  --color-female-nonmember-bg: color-mix(in srgb, var(--color-female-bg) 85%, black);
+
   --color-jagang-male: #191f28;
   --color-jagang-male-bg: #e1e3e8;
 

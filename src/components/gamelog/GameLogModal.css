@@ -73,6 +73,16 @@
   border-left-color: var(--color-jagang-female);
 }
 
+.gamelog-player-row.gender-male.is-nonmember {
+  background: var(--color-male-nonmember-bg);
+  border-left-color: var(--color-male-nonmember);
+}
+
+.gamelog-player-row.gender-female.is-nonmember {
+  background: var(--color-female-nonmember-bg);
+  border-left-color: var(--color-female-nonmember);
+}
+
 .gamelog-player-row.is-selected {
   outline: 2px solid var(--color-primary);
   outline-offset: -2px;
@@ -201,6 +211,16 @@
 .gamelog-entry-player.gender-female.is-jagang {
   background: var(--color-jagang-female-bg);
   color: var(--color-jagang-female);
+}
+
+.gamelog-entry-player.gender-male.is-nonmember {
+  background: var(--color-male-nonmember-bg);
+  color: var(--color-male-nonmember);
+}
+
+.gamelog-entry-player.gender-female.is-nonmember {
+  background: var(--color-female-nonmember-bg);
+  color: var(--color-female-nonmember);
 }
 
 .gamelog-entry-player .skill-game-count-skill {

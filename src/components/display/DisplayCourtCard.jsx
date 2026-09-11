@@ -1,6 +1,7 @@
 import { useNow } from '../../hooks/useElapsedTimer'
 import { formatElapsed } from '../../lib/time'
 import { genderColorClass } from '../../lib/genderColor'
+import { participantFacingSkill } from '../../data/skillLevels'
 import { SkillGameCount } from '../common/SkillGameCount'
 import './DisplayCourtCard.css'
 
@@ -39,7 +40,7 @@ export function DisplayCourtCard({ court, game, playersById }) {
               <div key={id} className={`display-court-player ${genderColorClass(player)}`}>
                 <span className="display-court-player-name">{player.name}</span>
                 <span className="display-court-player-skill">
-                  <SkillGameCount skill={player.skill} totalGames={player.totalGames} />
+                  <SkillGameCount skill={participantFacingSkill(player.skill)} totalGames={player.totalGames} />
                 </span>
               </div>
             )

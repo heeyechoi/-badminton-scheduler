@@ -19,6 +19,7 @@ export function RecommendationPanel() {
   const queueOrder = useAppStore((s) => s.queueOrder)
   const gamesById = useAppStore((s) => s.gamesById)
   const targetModeEnabled = useAppStore((s) => s.targetModeEnabled)
+  const session = useAppStore((s) => s.session)
   const [typeFilter, setTypeFilter] = useState([])
 
   const selectType = (type) => {
@@ -42,9 +43,21 @@ export function RecommendationPanel() {
       activeGameByPlayer: activeByPlayer,
       typeFilter,
       reservedIds,
+      startedAt: session.startedAt,
+      durationMinutes: session.durationMinutes,
       topN: DISPLAY_COUNT,
     })
-  }, [players, targetPlayerIds, rejectedSignatures, activeSignatures, activeByPlayer, typeFilter, reservedIds])
+  }, [
+    players,
+    targetPlayerIds,
+    rejectedSignatures,
+    activeSignatures,
+    activeByPlayer,
+    typeFilter,
+    reservedIds,
+    session.startedAt,
+    session.durationMinutes,
+  ])
 
   return (
     <section className="recommendation-panel">

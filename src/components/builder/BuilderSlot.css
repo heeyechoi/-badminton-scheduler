@@ -45,6 +45,14 @@
   background: var(--color-jagang-female-bg);
 }
 
+.builder-slot.gender-male.is-nonmember {
+  background: var(--color-male-nonmember-bg);
+}
+
+.builder-slot.gender-female.is-nonmember {
+  background: var(--color-female-nonmember-bg);
+}
+
 .builder-slot-name {
   font-size: 14px;
   font-weight: 700;

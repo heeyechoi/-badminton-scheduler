@@ -82,6 +82,16 @@
   color: var(--color-jagang-female);
 }
 
+.suggestion-player.gender-male.is-nonmember {
+  background: var(--color-male-nonmember-bg);
+  color: var(--color-male-nonmember);
+}
+
+.suggestion-player.gender-female.is-nonmember {
+  background: var(--color-female-nonmember-bg);
+  color: var(--color-female-nonmember);
+}
+
 .suggestion-player.is-busy {
   border: 1px dashed currentColor;
   opacity: 0.75;

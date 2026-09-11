@@ -2,18 +2,31 @@ import { classifyAndScoreSkill, balancedTeamSplit } from './skill'
 import { fairnessScore, ratioBalanceScore, repeatScore, typeBalanceScore } from './fairness'
 import { deriveGameType } from './gameType'
 import { isUnavailable } from './playerStatus'
+import { NON_MEMBER_SKILL } from '../data/skillLevels'
 
 const WINDOW_SIZE = 16
 const TOP_N_DEFAULT = 5
 const MAX_SHARED_PLAYERS = 2
+// 비동호인 can't hold a team on their own against another 비동호인 (see
+// balancedTeamSplit in skill.js), so a game can have at most one per team —
+// more than 2 in the group of 4 makes an even split impossible, so such
+// combinations are excluded outright rather than scored and ranked low.
+const MAX_NON_MEMBERS_PER_GAME = 2
 
-// Skill quality is weighted highest so a genuinely mismatched foursome (e.g. 자강
-// carried by only lower-tier players) can't out-rank a well-matched one just
-// because it happens to score well on novelty/fairness. typeBalance carries real
-// weight (not a token nudge) — combined with its worst-served-player scoring in
-// fairness.js, someone heavily skewed toward one type (e.g. 혼복 9 vs 여복 4)
-// should visibly get steered toward the type they're missing.
-const WEIGHTS = { skill: 0.35, fairness: 0.15, ratio: 0.15, repeat: 0.15, typeBalance: 0.2 }
+// repeat (avoid replaying the same pairs) is the top priority — a club session's
+// main complaint is the same small clique ending up matched together over and
+// over, so a candidate with fresh pairings should usually beat one that's merely
+// better-matched on skill. fairness (game-count/wait spread) is a close second
+// since it drives the same "everyone gets a turn" goal. skill still matters (a
+// genuinely mismatched foursome shouldn't win just on novelty) but no longer
+// dominates. typeBalance/ratio keep real weight so nobody gets stuck almost
+// entirely in one game type or one intensity band.
+const WEIGHTS = { repeat: 0.3, fairness: 0.2, skill: 0.2, typeBalance: 0.15, ratio: 0.15 }
+// fairness gets progressively more weight as the session's remaining time shrinks
+// (see `remainingRatio` below) — with little time left, spreading games evenly
+// across people who've played less matters more than it does early on when
+// there's plenty of time for things to even out naturally.
+const FAIRNESS_TIME_BOOST_MAX = 0.6
 const TARGET_MODE_BOOST = 0.5
 // Suggestions that would pull in a player currently mid-game or resting are still
 // useful (pre-booking their next game), but should rank behind equally-good all-available ones.
@@ -86,6 +99,20 @@ function sameSkillNoveltySupply(pool, activeGameByPlayer) {
   return total === 0 ? 0 : fresh / total
 }
 
+/**
+ * 1 = full session time left (or not started/scheduled for later), 0 = the
+ * session's end time has arrived or passed. Feeds the fairness-weight boost in
+ * scoreCandidate so recommendations lean harder toward evening out game counts
+ * once there isn't much time left to fix things naturally.
+ */
+function sessionRemainingRatio(startedAt, durationMinutes, now) {
+  if (!startedAt || !durationMinutes) return 1
+  if (now < startedAt) return 1
+  const totalMs = durationMinutes * 60 * 1000
+  const remainingMs = startedAt + totalMs - now
+  return Math.min(1, Math.max(0, remainingMs / totalMs))
+}
+
 function combinations(arr, k) {
   const results = []
   function pick(start, chosen) {
@@ -144,6 +171,8 @@ function windowPool(pool, now, targetPlayerIds = []) {
  * Scores one candidate foursome. Returns null if the game type can't be formed
  * (deriveGameType always succeeds for any 4 people, so this never actually returns null,
  * kept as an explicit hook for future hard constraints).
+ * @param {number} [options.remainingRatio] 1 = full session time left, 0 = session
+ *   about to end — boosts the fairness weight as it drops toward 0.
  */
 export function scoreCandidate(group, pool, options = {}) {
   const { classification, skillScore } = classifyAndScoreSkill(group)
@@ -157,9 +186,12 @@ export function scoreCandidate(group, pool, options = {}) {
   // and so the team-split-gap penalty below can see how lopsided it really is.
   const { teamA, teamB, gap: teamSplitGap } = balancedTeamSplit(group, type)
 
+  const remainingRatio = Math.min(1, Math.max(0, options.remainingRatio ?? 1))
+  const fairnessWeight = WEIGHTS.fairness * (1 + FAIRNESS_TIME_BOOST_MAX * (1 - remainingRatio))
+
   let total =
     WEIGHTS.skill * skillScore +
-    WEIGHTS.fairness * fairness +
+    fairnessWeight * fairness +
     WEIGHTS.ratio * ratio +
     WEIGHTS.repeat * repeat +
     WEIGHTS.typeBalance * typeBalance
@@ -238,6 +270,10 @@ export function scoreCandidate(group, pool, options = {}) {
  *   valid but lower-scoring type still surfaces instead of being crowded out by unfiltered top picks)
  * @param {number} [options.topN]
  * @param {number} [options.now]
+ * @param {number|null} [options.startedAt] session start timestamp — with
+ *   `durationMinutes`, used to boost fairness as the session's remaining time
+ *   shrinks (see FAIRNESS_TIME_BOOST_MAX). Omitted/not-yet-started = no boost.
+ * @param {number} [options.durationMinutes]
  */
 export function generateSuggestions(players, options = {}) {
   const now = options.now ?? Date.now()
@@ -245,6 +281,7 @@ export function generateSuggestions(players, options = {}) {
   const pool = eligiblePool(players, options.reservedIds)
   if (pool.length < 4) return []
 
+  const remainingRatio = sessionRemainingRatio(options.startedAt, options.durationMinutes, now)
   const window = windowPool(pool, now, options.targetPlayerIds)
   const groups = combinations(window, 4)
 
@@ -254,9 +291,12 @@ export function generateSuggestions(players, options = {}) {
       if (options.cooldownSignatures?.has(signature)) return null
       if (options.activeSignatures?.has(signature)) return null
       if (options.typeFilter?.length && !options.typeFilter.includes(deriveGameType(group))) return null
+      const nonMemberCount = group.filter((p) => p.skill === NON_MEMBER_SKILL).length
+      if (nonMemberCount > MAX_NON_MEMBERS_PER_GAME) return null
       const score = scoreCandidate(group, pool, {
         targetPlayerIds: options.targetPlayerIds,
         activeGameByPlayer: options.activeGameByPlayer,
+        remainingRatio,
         now,
       })
       return { id: signature, players: group, ...score }

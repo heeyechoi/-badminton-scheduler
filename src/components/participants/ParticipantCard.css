@@ -86,6 +86,31 @@
   background: var(--color-jagang-female);
 }
 
+.participant-card.gender-male.is-nonmember {
+  background: var(--color-male-nonmember-bg);
+  border-left-color: var(--color-male-nonmember);
+}
+
+.participant-card.gender-female.is-nonmember {
+  background: var(--color-female-nonmember-bg);
+  border-left-color: var(--color-female-nonmember);
+}
+
+.participant-card.gender-male.is-nonmember .participant-card-skill {
+  background: var(--color-male-nonmember);
+}
+
+.participant-card.gender-female.is-nonmember .participant-card-skill {
+  background: var(--color-female-nonmember);
+}
+
+/* "비동호인" is 4 characters vs. a single letter/자강, so it needs to shrink a
+   touch to sit comfortably in the same pill shape as every other skill badge. */
+.participant-card.is-nonmember .participant-card-skill {
+  font-size: 11px;
+  padding: 4px 7px;
+}
+
 /* Resting always wins visually, regardless of gender/자강 coloring above. */
 .participant-card.is-resting {
   background: var(--color-rest-bg) !important;

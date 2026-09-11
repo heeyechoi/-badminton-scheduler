@@ -35,6 +35,16 @@
   border-left-color: var(--color-jagang-female);
 }
 
+.manage-row.gender-male.is-nonmember {
+  background: var(--color-male-nonmember-bg);
+  border-left-color: var(--color-male-nonmember);
+}
+
+.manage-row.gender-female.is-nonmember {
+  background: var(--color-female-nonmember-bg);
+  border-left-color: var(--color-female-nonmember);
+}
+
 .manage-row-info {
   display: flex;
   align-items: baseline;

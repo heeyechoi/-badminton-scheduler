@@ -104,9 +104,19 @@ export function balancedTeamSplit(players, type) {
     partitions.push([[a, d], [b, c]])
   }
 
-  let best = partitions[0]
+  // 비동호인 can't hold their own against another 비동호인 as a team, so whenever
+  // a split can keep them on separate teams, prefer only those splits. With at
+  // most 2 비동호인 in the group (matching.js filters out more) there's always
+  // at least one such split, so this never empties the candidate list.
+  const nonMemberCount = (team) => team.filter((p) => p.skill === '비동호인').length
+  const separatesNonMembers = partitions.filter(
+    ([teamA, teamB]) => nonMemberCount(teamA) < 2 && nonMemberCount(teamB) < 2,
+  )
+  const validPartitions = separatesNonMembers.length > 0 ? separatesNonMembers : partitions
+
+  let best = validPartitions[0]
   let bestGap = Infinity
-  for (const [teamA, teamB] of partitions) {
+  for (const [teamA, teamB] of validPartitions) {
     const sumA = teamA.reduce((s, p) => s + idx(p), 0)
     const sumB = teamB.reduce((s, p) => s + idx(p), 0)
     const gap = Math.abs(sumA - sumB)

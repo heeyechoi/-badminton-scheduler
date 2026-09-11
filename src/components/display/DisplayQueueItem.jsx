@@ -1,4 +1,5 @@
 import { genderColorClass } from '../../lib/genderColor'
+import { participantFacingSkill } from '../../data/skillLevels'
 import './DisplayQueueItem.css'
 
 export function DisplayQueueItem({ order, game, playersById }) {
@@ -14,7 +15,10 @@ export function DisplayQueueItem({ order, game, playersById }) {
             if (!player) return null
             return (
               <span key={id ?? i} className={`display-queue-player ${genderColorClass(player)}`}>
-                {player.name} <span className="display-queue-player-skill">{player.skill}</span>
+                {player.name}{' '}
+                {participantFacingSkill(player.skill) && (
+                  <span className="display-queue-player-skill">{player.skill}</span>
+                )}
               </span>
             )
           })}

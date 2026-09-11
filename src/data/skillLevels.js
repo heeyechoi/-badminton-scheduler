@@ -18,3 +18,12 @@ export const GAME_TYPES = ['혼복', '남복', '여복']
 export function skillIndex(skill) {
   return SKILL_ORDER.indexOf(skill)
 }
+
+export const NON_MEMBER_SKILL = '비동호인'
+
+// 비동호인 is only meaningful to the admin (who needs it to pair them with a
+// member) — participant-facing screens (미리보기/참여자 화면) show nothing in
+// its place rather than the label, so guests aren't singled out on the public board.
+export function participantFacingSkill(skill) {
+  return skill === NON_MEMBER_SKILL ? null : skill
+}

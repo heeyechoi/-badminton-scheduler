@@ -128,6 +128,16 @@
   color: var(--color-jagang-female);
 }
 
+.queue-player.gender-male.is-nonmember {
+  background: var(--color-male-nonmember-bg);
+  color: var(--color-male-nonmember);
+}
+
+.queue-player.gender-female.is-nonmember {
+  background: var(--color-female-nonmember-bg);
+  color: var(--color-female-nonmember);
+}
+
 .queue-player.is-busy {
   border: 1px dashed currentColor;
   opacity: 0.75;

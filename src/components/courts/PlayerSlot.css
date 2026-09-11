@@ -46,6 +46,14 @@
   background: var(--color-jagang-female-bg);
 }
 
+.player-slot-card.gender-male.is-nonmember {
+  background: var(--color-male-nonmember-bg);
+}
+
+.player-slot-card.gender-female.is-nonmember {
+  background: var(--color-female-nonmember-bg);
+}
+
 /* Overtime tints the whole court box red — a white outline keeps each player
    card visually separate from that background instead of blending into it. */
 .court-card-overtime .player-slot-card {
@@ -90,6 +98,14 @@
 
 .player-slot-card.gender-female.is-jagang .skill-game-count-skill {
   background: var(--color-jagang-female);
+}
+
+.player-slot-card.gender-male.is-nonmember .skill-game-count-skill {
+  background: var(--color-male-nonmember);
+}
+
+.player-slot-card.gender-female.is-nonmember .skill-game-count-skill {
+  background: var(--color-female-nonmember);
 }
 
 .player-slot-skill .skill-game-count-sep {
