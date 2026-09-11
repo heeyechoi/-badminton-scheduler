@@ -72,13 +72,18 @@ function hasSaturatedTrio(group, threshold) {
  * Fraction of same-skill-label pairs in the pool that have never played together.
  * 1 = every same-skill pair is still fresh (early session), 0 = they've all played
  * at least once already (or no skill label has 2+ people in the pool). A pair
- * currently playing together mid-game also counts as no longer fresh.
+ * currently playing together mid-game also counts as no longer fresh. 비동호인
+ * is excluded from this grouping entirely — unlike every real skill tier, "same
+ * skill" isn't a meaningful peer pool for a guest (there's no reason two 비동호인
+ * should be preferred over one paired with a strong member), so their pairs
+ * shouldn't count as "fresh same-skill supply" that suppresses cross-tier matches.
  * @param {{skill:string, id:string, pairHistory:Record<string,number>}[]} pool
  * @param {Map<string, object>} [activeGameByPlayer]
  */
 function sameSkillNoveltySupply(pool, activeGameByPlayer) {
   const bySkill = new Map()
   for (const p of pool) {
+    if (p.skill === NON_MEMBER_SKILL) continue
     if (!bySkill.has(p.skill)) bySkill.set(p.skill, [])
     bySkill.get(p.skill).push(p)
   }
@@ -225,7 +230,14 @@ export function scoreCandidate(group, pool, options = {}) {
     if (poolMen >= 4 && poolWomen >= 4) total *= GENDER_SPLIT_PENALTY
   }
 
-  if (classification === '즐겜') {
+  // 비동호인 has no realistic same-skill peer pool — crossing bands to play with
+  // an actual member is the normal, correct outcome for them, not a fallback to
+  // discourage until same-tier options run out. Without this exemption, any
+  // 비동호인 game reads as "즐겜" and gets penalized purely because OTHER tiers
+  // (e.g. two A players) still have fresh same-skill pairs sitting unplayed
+  // elsewhere in the pool — unrelated to whether this particular match is good.
+  const hasNonMember = group.some((p) => p.skill === NON_MEMBER_SKILL)
+  if (classification === '즐겜' && !hasNonMember) {
     const supply = sameSkillNoveltySupply(pool, options.activeGameByPlayer)
     if (supply > 0) total *= 1 - CROSS_BAND_NOVELTY_PENALTY_MAX * supply
   }
