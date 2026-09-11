@@ -18,6 +18,7 @@ export function Header() {
   const getAdminUrl = () => {
     const url = new URL(window.location.href)
     url.search = ''
+    url.searchParams.set('admin', '1')
     return url.toString()
   }
 

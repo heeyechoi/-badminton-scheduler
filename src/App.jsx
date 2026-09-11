@@ -23,7 +23,7 @@ const MOBILE_TABS = [
 
 export default function App() {
   const sessionStarted = useAppStore((s) => Boolean(s.session.startedAt))
-  const [wantsToCreate, setWantsToCreate] = useState(false)
+  const hasAdminParam = new URLSearchParams(window.location.search).get('admin') === '1'
   const isMobile = useIsMobile(640)
   const [mobileTab, setMobileTab] = useState('participants')
   const gamesById = useAppStore((s) => s.gamesById)
@@ -62,7 +62,7 @@ export default function App() {
   }, [theme])
 
   if (!sessionStarted) {
-    return wantsToCreate ? <SetupModal /> : <Landing onCreate={() => setWantsToCreate(true)} />
+    return hasAdminParam ? <SetupModal /> : <Landing />
   }
 
   const handleDragEnd = (event) => {

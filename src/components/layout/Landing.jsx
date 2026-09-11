@@ -2,9 +2,17 @@ import { useState } from 'react'
 import { Button } from '../common/Button'
 import './Landing.css'
 
-export function Landing({ onCreate }) {
+export function Landing() {
   const [mode, setMode] = useState('choose') // 'choose' | 'join'
   const [joinUrl, setJoinUrl] = useState('')
+
+  // A real navigation (not just local UI state) so the admin URL is
+  // bookmarkable/shareable on its own — reopening it skips this screen.
+  const handleCreate = () => {
+    const url = new URL(window.location.href)
+    url.searchParams.set('admin', '1')
+    window.location.href = url.toString()
+  }
 
   const handleJoin = () => {
     const trimmed = joinUrl.trim()
@@ -19,7 +27,7 @@ export function Landing({ onCreate }) {
         {mode === 'choose' ? (
           <>
             <p className="landing-subtitle">운동을 새로 만들거나, 받은 링크로 참여하세요</p>
-            <Button variant="primary" style={{ width: '100%' }} onClick={onCreate}>
+            <Button variant="primary" style={{ width: '100%' }} onClick={handleCreate}>
               운동 생성
             </Button>
             <Button
