@@ -1,0 +1,30 @@
+.datetime-step-input {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.datetime-step-date,
+.datetime-step-select {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 10px 10px;
+  font-size: 14px;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.datetime-step-date {
+  flex: 1 1 140px;
+  min-width: 140px;
+}
+
+.datetime-step-select {
+  flex: 0 0 auto;
+}
+
+.datetime-step-date:focus,
+.datetime-step-select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}

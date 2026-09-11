@@ -4,10 +4,6 @@
   margin: var(--space-2) 0 0;
 }
 
-.settings-time-input {
-  width: auto;
-}
-
 /* .setup-field label {} targets any <label>, which Toggle's root also is —
    restore its intended flex row instead of the form-field block layout. */
 .settings-toggle-field label.toggle-row {

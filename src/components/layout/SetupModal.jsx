@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Modal } from '../common/Modal'
 import { Chip } from '../common/Chip'
 import { Button } from '../common/Button'
+import { DateTimeStepInput } from '../common/DateTimeStepInput'
 import { SKILL_ORDER, SKILL_LABELS } from '../../data/skillLevels'
 import { useAppStore } from '../../store/useAppStore'
 import { toDatetimeLocalValue, fromDatetimeLocalValue, roundToNearestMinutes } from '../../lib/time'
@@ -28,23 +29,12 @@ export function SetupModal() {
 
   // Picking a new start resets the end to +3h as a fresh default, rather than
   // leaving whatever end was there before — still freely editable right after.
-  // Both are snapped to the nearest 5 minutes — the input's step attribute only
-  // hints at the native picker's spinner increments, it doesn't stop someone
-  // from typing or scrolling to an odd minute like :31.
-  const handleStartChange = (e) => {
-    const parsed = fromDatetimeLocalValue(e.target.value)
-    if (parsed == null) {
-      setStartValue(e.target.value)
-      return
-    }
-    const newStart = roundToNearestMinutes(parsed)
-    setStartValue(toDatetimeLocalValue(newStart))
-    setEndValue(toDatetimeLocalValue(newStart + DEFAULT_DURATION_MS))
-  }
-
-  const handleEndChange = (e) => {
-    const parsed = fromDatetimeLocalValue(e.target.value)
-    setEndValue(parsed == null ? e.target.value : toDatetimeLocalValue(roundToNearestMinutes(parsed)))
+  // DateTimeStepInput already only ever offers 5-minute marks, so no further
+  // rounding is needed here.
+  const handleStartChange = (value) => {
+    setStartValue(value)
+    const newStart = fromDatetimeLocalValue(value)
+    if (newStart != null) setEndValue(toDatetimeLocalValue(newStart + DEFAULT_DURATION_MS))
   }
 
   const startAt = fromDatetimeLocalValue(startValue)
@@ -96,24 +86,12 @@ export function SetupModal() {
 
       <div className="setup-field">
         <label>시작 일시</label>
-        <input
-          type="datetime-local"
-          className="text-input setup-time-input"
-          step={300}
-          value={startValue}
-          onChange={handleStartChange}
-        />
+        <DateTimeStepInput value={startValue} onChange={handleStartChange} />
       </div>
 
       <div className="setup-field">
         <label>종료 일시</label>
-        <input
-          type="datetime-local"
-          className="text-input setup-time-input"
-          step={300}
-          value={endValue}
-          onChange={handleEndChange}
-        />
+        <DateTimeStepInput value={endValue} onChange={setEndValue} />
       </div>
 
       <Button

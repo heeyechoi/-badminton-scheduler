@@ -3,8 +3,9 @@ import { Modal } from '../common/Modal'
 import { Toggle } from '../common/Toggle'
 import { Button } from '../common/Button'
 import { Chip } from '../common/Chip'
+import { DateTimeStepInput } from '../common/DateTimeStepInput'
 import { useAppStore } from '../../store/useAppStore'
-import { toDatetimeLocalValue, fromDatetimeLocalValue, roundToNearestMinutes } from '../../lib/time'
+import { toDatetimeLocalValue, fromDatetimeLocalValue } from '../../lib/time'
 import { SKILL_ORDER, SKILL_LABELS } from '../../data/skillLevels'
 import './SettingsModal.css'
 
@@ -42,13 +43,11 @@ export function SettingsModal({ onClose }) {
     updateSessionSettings({ skillLevels: next })
   }
 
-  // Both snapped to the nearest 5 minutes — the input's step attribute only
-  // hints at the native picker's spinner increments, it doesn't stop someone
-  // from typing or scrolling to an odd minute like :31.
-  const handleStartChange = (e) => {
-    const parsed = fromDatetimeLocalValue(e.target.value)
-    if (parsed == null) return
-    const newStart = roundToNearestMinutes(parsed)
+  // DateTimeStepInput only ever offers 5-minute marks, so no extra rounding
+  // is needed here.
+  const handleStartChange = (value) => {
+    const newStart = fromDatetimeLocalValue(value)
+    if (newStart == null) return
     // Resets the end to +3h as a fresh default rather than keeping the old end
     // fixed — a new start time usually means "I'm replanning this", not "nudge
     // the schedule by a few minutes", so a 3-hour session is the more useful
@@ -56,10 +55,9 @@ export function SettingsModal({ onClose }) {
     updateSessionSettings({ startedAt: newStart, durationMinutes: DEFAULT_DURATION_MINUTES })
   }
 
-  const handleEndChange = (e) => {
-    const parsed = fromDatetimeLocalValue(e.target.value)
-    if (parsed == null) return
-    const newEnd = roundToNearestMinutes(parsed)
+  const handleEndChange = (value) => {
+    const newEnd = fromDatetimeLocalValue(value)
+    if (newEnd == null) return
     const newDuration = Math.round((newEnd - session.startedAt) / 60000)
     updateSessionSettings({ durationMinutes: Math.max(1, newDuration) })
   }
@@ -107,24 +105,12 @@ export function SettingsModal({ onClose }) {
 
       <div className="setup-field">
         <label>시작 일시</label>
-        <input
-          type="datetime-local"
-          className="text-input settings-time-input"
-          step={300}
-          value={startValue}
-          onChange={handleStartChange}
-        />
+        <DateTimeStepInput value={startValue} onChange={handleStartChange} />
       </div>
 
       <div className="setup-field">
         <label>종료 일시</label>
-        <input
-          type="datetime-local"
-          className="text-input settings-time-input"
-          step={300}
-          value={endValue}
-          onChange={handleEndChange}
-        />
+        <DateTimeStepInput value={endValue} onChange={handleEndChange} />
       </div>
 
       <div className="setup-field">
