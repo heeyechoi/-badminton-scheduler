@@ -64,7 +64,7 @@ export const useAppStore = create(
       gamesById: {},
       queueOrder: [],
 
-      filters: { genders: [], skills: [], hideInGame: true, sortByGameCount: false },
+      filters: { genders: [], skills: [], hideInGame: true, sortByGameCount: false, sortBy: 'skill' },
       // Fixed 4-slot array (null = empty seat) rather than a compacted list, so a
       // specific slot can be targeted directly by drag-drop or the picker dropdown.
       builderSelection: [null, null, null, null],
@@ -597,7 +597,7 @@ export const useAppStore = create(
           courts: [],
           gamesById: {},
           queueOrder: [],
-          filters: { genders: [], skills: [], hideInGame: true, sortByGameCount: false },
+          filters: { genders: [], skills: [], hideInGame: true, sortByGameCount: false, sortBy: 'skill' },
           builderSelection: [null, null, null, null],
           builderType: '혼복',
           targetPlayerIds: [],

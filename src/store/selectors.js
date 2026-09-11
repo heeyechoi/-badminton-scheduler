@@ -30,6 +30,15 @@ export function effectiveGameCount(player, reserved) {
   return player.totalGames + (player.status === '게임중' ? 1 : 0) + (reserved ? 1 : 0)
 }
 
+// 급수순: skill tier first, name as tiebreak (original default). 이름순: pure 가나다.
+function baseSortComparator(sortBy) {
+  if (sortBy === 'name') return (a, b) => a.name.localeCompare(b.name, 'ko')
+  return (a, b) => {
+    const skillDiff = skillIndex(a.skill) - skillIndex(b.skill)
+    return skillDiff !== 0 ? skillDiff : a.name.localeCompare(b.name, 'ko')
+  }
+}
+
 export function filteredParticipants(players, filters, reservedIds = new Set()) {
   let result = players
     .filter((p) => {
@@ -37,10 +46,7 @@ export function filteredParticipants(players, filters, reservedIds = new Set()) 
       if (filters.skills.length > 0 && !filters.skills.includes(p.skill)) return false
       return true
     })
-    .sort((a, b) => {
-      const skillDiff = skillIndex(a.skill) - skillIndex(b.skill)
-      return skillDiff !== 0 ? skillDiff : a.name.localeCompare(b.name, 'ko')
-    })
+    .sort(baseSortComparator(filters.sortBy))
 
   // "게임 수 적은 순" is a pure game-count ranking, on purpose — mixing in busy/reserved
   // people (not just available ones) is the point, so the operator can see exactly

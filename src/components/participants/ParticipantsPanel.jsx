@@ -72,6 +72,14 @@ export function ParticipantsPanel() {
             checked={filters.sortByGameCount}
             onChange={(v) => setFilters({ sortByGameCount: v })}
           />
+          <div className="filter-chip-group">
+            <Chip active={filters.sortBy !== 'name'} onClick={() => setFilters({ sortBy: 'skill' })}>
+              급수순
+            </Chip>
+            <Chip active={filters.sortBy === 'name'} onClick={() => setFilters({ sortBy: 'name' })}>
+              이름순
+            </Chip>
+          </div>
           <HamburgerMenu
             items={[
               { label: '참가자 관리', onClick: () => setShowManageModal(true) },
