@@ -12,12 +12,29 @@ export function Header() {
   const setSoundEnabled = useAppStore((s) => s.setSoundEnabled)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [gameLogOpen, setGameLogOpen] = useState(false)
+  const [linkCopied, setLinkCopied] = useState(false)
   const now = useNow()
 
-  const openDisplayView = () => {
+  const getDisplayUrl = () => {
     const url = new URL(window.location.href)
     url.searchParams.set('display', '1')
-    window.open(url.toString(), '_blank')
+    return url.toString()
+  }
+
+  const openDisplayView = () => {
+    window.open(getDisplayUrl(), '_blank')
+  }
+
+  const copyDisplayLink = async () => {
+    const url = getDisplayUrl()
+    try {
+      await navigator.clipboard.writeText(url)
+    } catch {
+      window.prompt('아래 링크를 복사하세요', url)
+      return
+    }
+    setLinkCopied(true)
+    setTimeout(() => setLinkCopied(false), 1500)
   }
 
   return (
@@ -50,6 +67,9 @@ export function Header() {
         </div>
         <button type="button" className="preview-btn" onClick={openDisplayView}>
           미리보기
+        </button>
+        <button type="button" className="preview-btn" onClick={copyDisplayLink}>
+          {linkCopied ? '복사됨!' : '🔗 링크 복사'}
         </button>
         <button type="button" className="preview-btn" onClick={() => setGameLogOpen(true)}>
           게임로그 보기
