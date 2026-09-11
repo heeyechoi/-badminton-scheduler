@@ -36,9 +36,8 @@ export function DisplayView() {
 
   return (
     <div className="display-shell">
-      {announcementBanner}
       <header className="display-header">
-        <div className="display-header-title">🏸 배드민턴 게임 스케줄러</div>
+        <div className="display-header-title">🏸 {session.name || '배드민턴 게임 스케줄러'}</div>
         <div className="display-header-timer">
           <span className="display-header-current">현재 {formatClockTime(now, { withSeconds: false })}</span>
           <span className="display-header-sep display-header-current">·</span>
@@ -55,6 +54,8 @@ export function DisplayView() {
           </span>
         </div>
       </header>
+
+      {announcementBanner}
 
       <div className="display-main">
         <div className="display-courts">

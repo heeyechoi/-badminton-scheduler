@@ -7,11 +7,13 @@ import { useAppStore } from '../../store/useAppStore'
 import { toDatetimeLocalValue, fromDatetimeLocalValue } from '../../lib/time'
 import './SetupModal.css'
 
+const DEFAULT_DURATION_MS = 3 * 60 * 60 * 1000
 const defaultStartValue = () => toDatetimeLocalValue(Date.now())
-const defaultEndValue = () => toDatetimeLocalValue(Date.now() + 3 * 60 * 60 * 1000)
+const defaultEndValue = () => toDatetimeLocalValue(Date.now() + DEFAULT_DURATION_MS)
 
 export function SetupModal() {
   const initSession = useAppStore((s) => s.initSession)
+  const [name, setName] = useState('')
   const [courtCount, setCourtCount] = useState(6)
   const [skillLevels, setSkillLevels] = useState([...SKILL_ORDER])
   const [startValue, setStartValue] = useState(defaultStartValue)
@@ -21,6 +23,15 @@ export function SetupModal() {
     setSkillLevels((prev) =>
       prev.includes(skill) ? prev.filter((s) => s !== skill) : [...prev, skill],
     )
+  }
+
+  // Picking a new start resets the end to +3h as a fresh default, rather than
+  // leaving whatever end was there before — still freely editable right after.
+  const handleStartChange = (e) => {
+    const value = e.target.value
+    setStartValue(value)
+    const newStart = fromDatetimeLocalValue(value)
+    if (newStart != null) setEndValue(toDatetimeLocalValue(newStart + DEFAULT_DURATION_MS))
   }
 
   const startAt = fromDatetimeLocalValue(startValue)
@@ -35,6 +46,17 @@ export function SetupModal() {
 
   return (
     <Modal title="운동 설정">
+      <div className="setup-field">
+        <label>운동 이름 (선택)</label>
+        <input
+          type="text"
+          className="text-input"
+          placeholder="배드민턴 게임 스케줄러"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+      </div>
+
       <div className="setup-field">
         <label>코트 수</label>
         <div className="setup-stepper">
@@ -64,8 +86,9 @@ export function SetupModal() {
         <input
           type="datetime-local"
           className="text-input setup-time-input"
+          step={300}
           value={startValue}
-          onChange={(e) => setStartValue(e.target.value)}
+          onChange={handleStartChange}
         />
       </div>
 
@@ -74,6 +97,7 @@ export function SetupModal() {
         <input
           type="datetime-local"
           className="text-input setup-time-input"
+          step={300}
           value={endValue}
           onChange={(e) => setEndValue(e.target.value)}
         />
@@ -89,6 +113,7 @@ export function SetupModal() {
             skillLevels,
             startAt,
             durationMinutes: Math.round((endAt - startAt) / 60000),
+            name: name.trim(),
           })
         }
       >

@@ -13,6 +13,9 @@ const initialSession = {
   skillLevels: [],
   durationMinutes: 180,
   startedAt: null,
+  // Shown in place of "배드민턴 게임 스케줄러" in the admin header and the
+  // participant/preview screen when set — falls back to that default otherwise.
+  name: '',
 }
 
 function makeCourts(count) {
@@ -81,9 +84,15 @@ export const useAppStore = create(
       announcement: '',
       setAnnouncement: (text) => set({ announcement: text }),
 
-      initSession: ({ courtCount, skillLevels, durationMinutes, startAt }) =>
+      initSession: ({ courtCount, skillLevels, durationMinutes, startAt, name }) =>
         set({
-          session: { courtCount, skillLevels, durationMinutes, startedAt: startAt ?? Date.now() },
+          session: {
+            courtCount,
+            skillLevels,
+            durationMinutes,
+            startedAt: startAt ?? Date.now(),
+            name: name ?? '',
+          },
           courts: makeCourts(courtCount),
         }),
 

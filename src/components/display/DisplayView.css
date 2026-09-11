@@ -24,9 +24,11 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-3) var(--space-6);
-  background: var(--color-warning);
-  color: #191f28;
+  margin: var(--space-4) var(--space-5) 0;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
   font-size: 15px;
   font-weight: 700;
   flex-shrink: 0;
@@ -44,7 +46,8 @@
 
 @media (max-width: 900px) {
   .display-announcement {
-    padding: var(--space-2) var(--space-4);
+    margin: var(--space-3) var(--space-4) 0;
+    padding: var(--space-2) var(--space-3);
     font-size: 13px;
   }
 }

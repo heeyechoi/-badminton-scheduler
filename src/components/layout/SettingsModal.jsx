@@ -8,6 +8,8 @@ import { toDatetimeLocalValue, fromDatetimeLocalValue } from '../../lib/time'
 import { SKILL_ORDER, SKILL_LABELS } from '../../data/skillLevels'
 import './SettingsModal.css'
 
+const DEFAULT_DURATION_MINUTES = 180
+
 export function SettingsModal({ onClose }) {
   const session = useAppStore((s) => s.session)
   const courts = useAppStore((s) => s.courts)
@@ -43,10 +45,11 @@ export function SettingsModal({ onClose }) {
   const handleStartChange = (e) => {
     const newStart = fromDatetimeLocalValue(e.target.value)
     if (newStart == null) return
-    // Keep the current end time fixed and let duration absorb the shift, so
-    // dragging the start earlier/later doesn't also silently move the end.
-    const newDuration = Math.round((endsAt - newStart) / 60000)
-    updateSessionSettings({ startedAt: newStart, durationMinutes: Math.max(1, newDuration) })
+    // Resets the end to +3h as a fresh default rather than keeping the old end
+    // fixed — a new start time usually means "I'm replanning this", not "nudge
+    // the schedule by a few minutes", so a 3-hour session is the more useful
+    // starting point (still freely editable via the 종료 일시 field right after).
+    updateSessionSettings({ startedAt: newStart, durationMinutes: DEFAULT_DURATION_MINUTES })
   }
 
   const handleEndChange = (e) => {
@@ -73,6 +76,17 @@ export function SettingsModal({ onClose }) {
   return (
     <Modal title="설정" onClose={onClose} width={420}>
       <div className="setup-field">
+        <label>운동 이름 (선택)</label>
+        <input
+          type="text"
+          className="text-input"
+          placeholder="배드민턴 게임 스케줄러"
+          value={session.name ?? ''}
+          onChange={(e) => updateSessionSettings({ name: e.target.value })}
+        />
+      </div>
+
+      <div className="setup-field">
         <label>코트 수</label>
         <div className="setup-stepper">
           <button type="button" onClick={() => changeCourtCount(-1)}>
@@ -91,8 +105,20 @@ export function SettingsModal({ onClose }) {
         <input
           type="datetime-local"
           className="text-input settings-time-input"
+          step={300}
           value={startValue}
           onChange={handleStartChange}
+        />
+      </div>
+
+      <div className="setup-field">
+        <label>종료 일시</label>
+        <input
+          type="datetime-local"
+          className="text-input settings-time-input"
+          step={300}
+          value={endValue}
+          onChange={handleEndChange}
         />
       </div>
 
@@ -109,16 +135,6 @@ export function SettingsModal({ onClose }) {
             </Chip>
           ))}
         </div>
-      </div>
-
-      <div className="setup-field">
-        <label>종료 일시</label>
-        <input
-          type="datetime-local"
-          className="text-input settings-time-input"
-          value={endValue}
-          onChange={handleEndChange}
-        />
       </div>
 
       <div className="setup-field settings-toggle-field">

@@ -49,7 +49,7 @@ export function Header() {
 
   return (
     <header className="app-header">
-      <div className="app-header-title">🏸 배드민턴 게임 스케줄러</div>
+      <div className="app-header-title">🏸 {session.name || '배드민턴 게임 스케줄러'}</div>
       <div className="app-header-right">
         <div className="session-timer">
           <div className="session-timer-item session-timer-current">

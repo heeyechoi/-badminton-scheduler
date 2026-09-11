@@ -45,12 +45,16 @@
   cursor: help;
 }
 
-/* Scoped to this panel (not the shared .panel-header-actions class from
-   ManualGameBuilder) so the 급수순/이름순/메뉴 group can be pinned to the
-   top-right independently of the two toggles, even when the row wraps. */
-.participants-panel .panel-header-actions {
-  flex-wrap: wrap;
-  justify-content: flex-end;
+/* 급수순/이름순/메뉴: kept as a direct child of .panel-header (not nested inside
+   .panel-header-actions, which the toggles below used to share) so it always
+   stays on the same line as the "참가자" title, right-aligned via the parent's
+   space-between — moving the toggles to their own row below is what frees up
+   the room for that. */
+.panel-header-sort-menu {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-left: auto;
 }
 
 .panel-header-toggles {
@@ -58,13 +62,7 @@
   align-items: center;
   gap: var(--space-2);
   flex-wrap: wrap;
-}
-
-.panel-header-sort-menu {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  margin-left: auto;
+  margin-bottom: var(--space-3);
 }
 
 .participants-list {

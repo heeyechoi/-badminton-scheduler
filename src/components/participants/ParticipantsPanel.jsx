@@ -61,37 +61,36 @@ export function ParticipantsPanel() {
             </Chip>
           </div>
         </div>
-        <div className="panel-header-actions">
-          <div className="panel-header-toggles">
-            <Toggle
-              label="매칭가능한 선수만"
-              checked={filters.hideInGame}
-              onChange={(v) => setFilters({ hideInGame: v })}
-            />
-            <Toggle
-              label="게임 수 적은 순"
-              checked={filters.sortByGameCount}
-              onChange={(v) => setFilters({ sortByGameCount: v })}
-            />
+        <div className="panel-header-sort-menu">
+          <div className="filter-chip-group">
+            <Chip active={filters.sortBy !== 'name'} onClick={() => setFilters({ sortBy: 'skill' })}>
+              급수순
+            </Chip>
+            <Chip active={filters.sortBy === 'name'} onClick={() => setFilters({ sortBy: 'name' })}>
+              이름순
+            </Chip>
           </div>
-          <div className="panel-header-sort-menu">
-            <div className="filter-chip-group">
-              <Chip active={filters.sortBy !== 'name'} onClick={() => setFilters({ sortBy: 'skill' })}>
-                급수순
-              </Chip>
-              <Chip active={filters.sortBy === 'name'} onClick={() => setFilters({ sortBy: 'name' })}>
-                이름순
-              </Chip>
-            </div>
-            <HamburgerMenu
-              items={[
-                { label: '참가자 관리', onClick: () => setShowManageModal(true) },
-                { label: '엑셀로 추가', onClick: () => setShowImportModal(true) },
-                { label: '+ 참가자 추가', onClick: () => setShowAddModal(true) },
-              ]}
-            />
-          </div>
+          <HamburgerMenu
+            items={[
+              { label: '참가자 관리', onClick: () => setShowManageModal(true) },
+              { label: '엑셀로 추가', onClick: () => setShowImportModal(true) },
+              { label: '+ 참가자 추가', onClick: () => setShowAddModal(true) },
+            ]}
+          />
         </div>
+      </div>
+
+      <div className="panel-header-toggles">
+        <Toggle
+          label="매칭가능한 선수만"
+          checked={filters.hideInGame}
+          onChange={(v) => setFilters({ hideInGame: v })}
+        />
+        <Toggle
+          label="게임 수 적은 순"
+          checked={filters.sortByGameCount}
+          onChange={(v) => setFilters({ sortByGameCount: v })}
+        />
       </div>
 
       <FilterBar />
