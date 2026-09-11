@@ -4,7 +4,7 @@ import { Toggle } from '../common/Toggle'
 import { Button } from '../common/Button'
 import { Chip } from '../common/Chip'
 import { useAppStore } from '../../store/useAppStore'
-import { toDatetimeLocalValue, fromDatetimeLocalValue } from '../../lib/time'
+import { toDatetimeLocalValue, fromDatetimeLocalValue, roundToNearestMinutes } from '../../lib/time'
 import { SKILL_ORDER, SKILL_LABELS } from '../../data/skillLevels'
 import './SettingsModal.css'
 
@@ -42,9 +42,13 @@ export function SettingsModal({ onClose }) {
     updateSessionSettings({ skillLevels: next })
   }
 
+  // Both snapped to the nearest 5 minutes — the input's step attribute only
+  // hints at the native picker's spinner increments, it doesn't stop someone
+  // from typing or scrolling to an odd minute like :31.
   const handleStartChange = (e) => {
-    const newStart = fromDatetimeLocalValue(e.target.value)
-    if (newStart == null) return
+    const parsed = fromDatetimeLocalValue(e.target.value)
+    if (parsed == null) return
+    const newStart = roundToNearestMinutes(parsed)
     // Resets the end to +3h as a fresh default rather than keeping the old end
     // fixed — a new start time usually means "I'm replanning this", not "nudge
     // the schedule by a few minutes", so a 3-hour session is the more useful
@@ -53,8 +57,9 @@ export function SettingsModal({ onClose }) {
   }
 
   const handleEndChange = (e) => {
-    const newEnd = fromDatetimeLocalValue(e.target.value)
-    if (newEnd == null) return
+    const parsed = fromDatetimeLocalValue(e.target.value)
+    if (parsed == null) return
+    const newEnd = roundToNearestMinutes(parsed)
     const newDuration = Math.round((newEnd - session.startedAt) / 60000)
     updateSessionSettings({ durationMinutes: Math.max(1, newDuration) })
   }

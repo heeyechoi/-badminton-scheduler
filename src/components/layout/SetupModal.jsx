@@ -4,12 +4,13 @@ import { Chip } from '../common/Chip'
 import { Button } from '../common/Button'
 import { SKILL_ORDER, SKILL_LABELS } from '../../data/skillLevels'
 import { useAppStore } from '../../store/useAppStore'
-import { toDatetimeLocalValue, fromDatetimeLocalValue } from '../../lib/time'
+import { toDatetimeLocalValue, fromDatetimeLocalValue, roundToNearestMinutes } from '../../lib/time'
 import './SetupModal.css'
 
 const DEFAULT_DURATION_MS = 3 * 60 * 60 * 1000
-const defaultStartValue = () => toDatetimeLocalValue(Date.now())
-const defaultEndValue = () => toDatetimeLocalValue(Date.now() + DEFAULT_DURATION_MS)
+const defaultStartValue = () => toDatetimeLocalValue(roundToNearestMinutes(Date.now()))
+const defaultEndValue = () =>
+  toDatetimeLocalValue(roundToNearestMinutes(Date.now()) + DEFAULT_DURATION_MS)
 
 export function SetupModal() {
   const initSession = useAppStore((s) => s.initSession)
@@ -27,11 +28,23 @@ export function SetupModal() {
 
   // Picking a new start resets the end to +3h as a fresh default, rather than
   // leaving whatever end was there before — still freely editable right after.
+  // Both are snapped to the nearest 5 minutes — the input's step attribute only
+  // hints at the native picker's spinner increments, it doesn't stop someone
+  // from typing or scrolling to an odd minute like :31.
   const handleStartChange = (e) => {
-    const value = e.target.value
-    setStartValue(value)
-    const newStart = fromDatetimeLocalValue(value)
-    if (newStart != null) setEndValue(toDatetimeLocalValue(newStart + DEFAULT_DURATION_MS))
+    const parsed = fromDatetimeLocalValue(e.target.value)
+    if (parsed == null) {
+      setStartValue(e.target.value)
+      return
+    }
+    const newStart = roundToNearestMinutes(parsed)
+    setStartValue(toDatetimeLocalValue(newStart))
+    setEndValue(toDatetimeLocalValue(newStart + DEFAULT_DURATION_MS))
+  }
+
+  const handleEndChange = (e) => {
+    const parsed = fromDatetimeLocalValue(e.target.value)
+    setEndValue(parsed == null ? e.target.value : toDatetimeLocalValue(roundToNearestMinutes(parsed)))
   }
 
   const startAt = fromDatetimeLocalValue(startValue)
@@ -99,7 +112,7 @@ export function SetupModal() {
           className="text-input setup-time-input"
           step={300}
           value={endValue}
-          onChange={(e) => setEndValue(e.target.value)}
+          onChange={handleEndChange}
         />
       </div>
 

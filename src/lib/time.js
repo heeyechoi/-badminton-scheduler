@@ -60,3 +60,15 @@ export function fromDatetimeLocalValue(value) {
   if ([y, m, d, hh, mm].some(Number.isNaN)) return null
   return new Date(y, m - 1, d, hh, mm, 0, 0).getTime()
 }
+
+/**
+ * Snaps a timestamp to the nearest N-minute mark (e.g. :00/:05/:10/...). The
+ * `step` attribute on `<input type="datetime-local">` only nudges the native
+ * picker's spinner increments — typing or scrolling can still land on any
+ * minute — so callers round the parsed value through this on every change to
+ * actually enforce 5-minute increments.
+ */
+export function roundToNearestMinutes(timestamp, minutes = 5) {
+  const stepMs = minutes * 60 * 1000
+  return Math.round(timestamp / stepMs) * stepMs
+}
