@@ -1,5 +1,5 @@
 import { Chip } from '../common/Chip'
-import { SKILL_ORDER } from '../../data/skillLevels'
+import { SKILL_ORDER, skillCode } from '../../data/skillLevels'
 import { useAppStore } from '../../store/useAppStore'
 import './FilterBar.css'
 
@@ -22,7 +22,7 @@ export function FilterBar() {
         <div className="filter-chip-group filter-chip-group-wrap">
           {(session.skillLevels.length > 0 ? session.skillLevels : SKILL_ORDER).map((skill) => (
             <Chip key={skill} active={filters.skills.includes(skill)} onClick={() => toggleSkill(skill)}>
-              {skill}
+              {skillCode(skill)}
             </Chip>
           ))}
         </div>

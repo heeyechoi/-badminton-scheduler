@@ -3,7 +3,7 @@ import { Modal } from '../common/Modal'
 import { Chip } from '../common/Chip'
 import { Button } from '../common/Button'
 import { useAppStore } from '../../store/useAppStore'
-import { SKILL_ORDER } from '../../data/skillLevels'
+import { SKILL_ORDER, skillCode } from '../../data/skillLevels'
 import { reservedPlayerIds } from '../../store/selectors'
 import { genderColorClass } from '../../lib/genderColor'
 import './ManageParticipantsModal.css'
@@ -91,7 +91,7 @@ export function ManageParticipantsModal({ onClose }) {
                       active={draft.skill === skill}
                       onClick={() => setDraft((d) => ({ ...d, skill }))}
                     >
-                      {skill}
+                      {skillCode(skill)}
                     </Chip>
                   ))}
                 </div>
@@ -117,7 +117,7 @@ export function ManageParticipantsModal({ onClose }) {
             <div key={player.id} className={`manage-row ${genderColorClass(player)}`}>
               <div className="manage-row-info">
                 <span className="manage-row-name">{player.name}</span>
-                <span className="manage-row-skill">{player.skill}</span>
+                <span className="manage-row-skill">{skillCode(player.skill)}</span>
                 <span className="manage-row-affiliation">{player.affiliation || '-'}</span>
               </div>
               <div className="manage-row-actions">

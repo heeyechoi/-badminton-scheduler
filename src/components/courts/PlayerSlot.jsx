@@ -1,6 +1,7 @@
 import { useDraggable, useDroppable } from '@dnd-kit/core'
 import { CSS } from '@dnd-kit/utilities'
 import { genderColorClass } from '../../lib/genderColor'
+import { skillCode } from '../../data/skillLevels'
 import { slotId as makeSlotId } from '../../lib/dragIds'
 import { SkillGameCount } from '../common/SkillGameCount'
 import './PlayerSlot.css'
@@ -37,7 +38,7 @@ export function PlayerSlot({ gameId, teamKey, index, player }) {
       >
         <span className="player-slot-name">{player.name}</span>
         <span className="player-slot-skill">
-          <SkillGameCount skill={player.skill} totalGames={player.totalGames} />
+          <SkillGameCount skill={skillCode(player.skill)} totalGames={player.totalGames} />
         </span>
       </div>
     </div>

@@ -4,6 +4,7 @@ import { useAppStore } from '../../store/useAppStore'
 import { difficultyLevel } from '../../lib/skill'
 import { isUnavailable } from '../../lib/playerStatus'
 import { genderColorClass } from '../../lib/genderColor'
+import { skillCode } from '../../data/skillLevels'
 import { SkillGameCount } from '../common/SkillGameCount'
 import './SuggestionCard.css'
 
@@ -47,7 +48,7 @@ export function SuggestionCard({ suggestion, reservedIds }) {
                   !selectable ? 'is-locked' : ''
                 }`}
               >
-                {p.name} <SkillGameCount skill={p.skill} totalGames={p.totalGames} />
+                {p.name} <SkillGameCount skill={skillCode(p.skill)} totalGames={p.totalGames} />
               </button>
             )
           })}

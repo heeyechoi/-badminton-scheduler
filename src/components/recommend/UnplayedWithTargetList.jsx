@@ -1,6 +1,7 @@
 import { useAppStore } from '../../store/useAppStore'
 import { unplayedWithTargets } from '../../lib/matching'
 import { skillIndex } from '../../lib/skill'
+import { skillCode } from '../../data/skillLevels'
 import { reservedPlayerIds, activeGameByPlayer, queuedGameByPlayer } from '../../store/selectors'
 import './UnplayedWithTargetList.css'
 
@@ -47,7 +48,7 @@ export function UnplayedWithTargetList() {
                   onClick={() => selectable && toggleBuilderSelect(p.id)}
                   disabled={!selectable}
                 >
-                  {p.name} <span className="unplayed-chip-skill">{p.skill}</span>
+                  {p.name} <span className="unplayed-chip-skill">{skillCode(p.skill)}</span>
                 </button>
               )
             })}

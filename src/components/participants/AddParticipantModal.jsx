@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Modal } from '../common/Modal'
 import { Chip } from '../common/Chip'
 import { Button } from '../common/Button'
-import { SKILL_ORDER } from '../../data/skillLevels'
+import { SKILL_ORDER, skillCode } from '../../data/skillLevels'
 import { useAppStore } from '../../store/useAppStore'
 
 export function AddParticipantModal({ onClose }) {
@@ -61,7 +61,7 @@ export function AddParticipantModal({ onClose }) {
         <div className="setup-chip-row">
           {SKILL_ORDER.map((s) => (
             <Chip key={s} active={skill === s} onClick={() => setSkill(s)}>
-              {s}
+              {skillCode(s)}
             </Chip>
           ))}
         </div>

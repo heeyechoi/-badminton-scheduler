@@ -2,6 +2,7 @@ import { useDraggable, useDroppable } from '@dnd-kit/core'
 import { CSS } from '@dnd-kit/utilities'
 import { useAppStore } from '../../store/useAppStore'
 import { genderColorClass } from '../../lib/genderColor'
+import { skillCode } from '../../data/skillLevels'
 import { builderSlotId } from '../../lib/dragIds'
 import { SkillGameCount } from '../common/SkillGameCount'
 import './BuilderSlot.css'
@@ -44,7 +45,7 @@ export function BuilderSlot({ index, player }) {
       >
         <span className="builder-slot-name">{player.name}</span>
         <span className="builder-slot-skill">
-          <SkillGameCount skill={player.skill} totalGames={player.totalGames} />
+          <SkillGameCount skill={skillCode(player.skill)} totalGames={player.totalGames} />
         </span>
       </button>
     </span>

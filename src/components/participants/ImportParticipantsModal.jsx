@@ -3,7 +3,7 @@ import { Modal } from '../common/Modal'
 import { Button } from '../common/Button'
 import { useAppStore } from '../../store/useAppStore'
 import { parseParticipantWorkbook, downloadParticipantTemplate } from '../../lib/excelImport'
-import { SKILL_ORDER } from '../../data/skillLevels'
+import { SKILL_ORDER, skillCode } from '../../data/skillLevels'
 import './ImportParticipantsModal.css'
 
 export function ImportParticipantsModal({ onClose }) {
@@ -35,7 +35,7 @@ export function ImportParticipantsModal({ onClose }) {
   return (
     <Modal title="엑셀로 참가자 추가" onClose={onClose} width={480}>
       <p className="import-hint">
-        컬럼 순서: 이름 · 성별(남/여) · 급수({SKILL_ORDER.join('/')}) · 소속. 첫 줄은 제목행이어도
+        컬럼 순서: 이름 · 성별(남/여) · 급수({SKILL_ORDER.map(skillCode).join('/')}) · 소속. 첫 줄은 제목행이어도
         없어도 됩니다.
       </p>
 
@@ -68,7 +68,7 @@ export function ImportParticipantsModal({ onClose }) {
                 <div key={i} className="import-row">
                   <span className="import-row-name">{p.name}</span>
                   <span>{p.gender}</span>
-                  <span>{p.skill}</span>
+                  <span>{skillCode(p.skill)}</span>
                   <span className="import-row-affiliation">{p.affiliation || '-'}</span>
                 </div>
               ))}

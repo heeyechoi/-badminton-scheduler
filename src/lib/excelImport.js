@@ -1,4 +1,4 @@
-import { SKILL_ORDER } from '../data/skillLevels'
+import { SKILL_ORDER, NON_MEMBER_SKILL, skillCode } from '../data/skillLevels'
 
 const HEADER_ALIASES = {
   name: ['이름', 'name', '성명'],
@@ -21,6 +21,7 @@ function normalizeSkill(raw) {
   if (v.includes('왕') && v.includes('초심')) return 'F'
   if (v.includes('초심')) return 'E'
   if (v.includes('자강')) return '자강'
+  if (v.includes('입문')) return NON_MEMBER_SKILL
   return null
 }
 
@@ -76,7 +77,7 @@ export async function parseParticipantWorkbook(arrayBuffer) {
           ? '성별/급수 값을 확인해주세요'
           : !gender
             ? '성별 값을 확인해주세요 (남/여)'
-            : `급수 값을 확인해주세요 (${SKILL_ORDER.join('/')})`,
+            : `급수 값을 확인해주세요 (${SKILL_ORDER.map(skillCode).join('/')})`,
       })
       return
     }

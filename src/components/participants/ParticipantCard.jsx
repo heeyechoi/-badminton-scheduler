@@ -2,6 +2,7 @@ import { useDraggable } from '@dnd-kit/core'
 import { CSS } from '@dnd-kit/utilities'
 import { useAppStore } from '../../store/useAppStore'
 import { genderColorClass } from '../../lib/genderColor'
+import { skillCode } from '../../data/skillLevels'
 import { rosterId } from '../../lib/dragIds'
 import { useIsMobile } from '../../hooks/useIsMobile'
 import { effectiveGameCount } from '../../store/selectors'
@@ -56,7 +57,7 @@ export function ParticipantCard({ player, selected, dimmed, reserved, liveGame, 
     >
       <div className="participant-card-main">
         <span className="participant-card-name">{player.name}</span>
-        <span className="participant-card-skill">{player.skill}</span>
+        <span className="participant-card-skill">{skillCode(player.skill)}</span>
         {isMobile && <span className="participant-card-games">{displayedGames}게임</span>}
       </div>
       <div className="participant-card-sub">{player.affiliation || '소속 없음'}</div>

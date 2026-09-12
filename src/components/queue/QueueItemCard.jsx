@@ -7,7 +7,7 @@ import { genderColorClass } from '../../lib/genderColor'
 import { slotId } from '../../lib/dragIds'
 import { useAppStore } from '../../store/useAppStore'
 import { reservedPlayerIds } from '../../store/selectors'
-import { skillIndex } from '../../data/skillLevels'
+import { skillIndex, skillCode } from '../../data/skillLevels'
 import { SkillGameCount } from '../common/SkillGameCount'
 import './QueueItemCard.css'
 
@@ -52,7 +52,7 @@ function QueuePlayerChip({ gameId, teamKey, index, player }) {
           <option value="">선수 선택</option>
           {selectable.map((p) => (
             <option key={p.id} value={p.id}>
-              {p.name} ({p.skill})
+              {p.name} ({skillCode(p.skill)})
             </option>
           ))}
         </select>
@@ -74,7 +74,7 @@ function QueuePlayerChip({ gameId, teamKey, index, player }) {
           player.status === '게임중' ? 'is-busy' : ''
         } ${player.status === '휴식중' ? 'is-resting' : ''}`}
       >
-        {player.name} <SkillGameCount skill={player.skill} totalGames={player.totalGames} />
+        {player.name} <SkillGameCount skill={skillCode(player.skill)} totalGames={player.totalGames} />
       </span>
     </span>
   )

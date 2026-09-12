@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { Modal } from '../common/Modal'
 import { Badge } from '../common/Badge'
 import { useAppStore } from '../../store/useAppStore'
-import { skillIndex } from '../../data/skillLevels'
+import { skillIndex, skillCode } from '../../data/skillLevels'
 import { genderColorClass } from '../../lib/genderColor'
 import { formatClockTime } from '../../lib/time'
 import { playersById, gameLog } from '../../store/selectors'
@@ -72,7 +72,7 @@ export function GameLogModal({ onClose }) {
                 onClick={() => setSelectedId((current) => (current === p.id ? null : p.id))}
               >
                 <span className="gamelog-player-name">{p.name}</span>
-                <span className="gamelog-player-skill">{p.skill}</span>
+                <span className="gamelog-player-skill">{skillCode(p.skill)}</span>
               </button>
             ))}
           </div>
@@ -83,7 +83,7 @@ export function GameLogModal({ onClose }) {
             {selected ? (
               <>
                 <span className="gamelog-main-name">{selected.name}</span>
-                <span className="gamelog-main-skill">{selected.skill}</span>
+                <span className="gamelog-main-skill">{skillCode(selected.skill)}</span>
                 <span className="gamelog-main-count">
                   총 {log.length}게임 (혼{typeCounts.혼복 ?? 0}·{sameGenderLabel}
                   {typeCounts[sameGenderType] ?? 0})
@@ -116,7 +116,7 @@ export function GameLogModal({ onClose }) {
                         p.id === selected?.id ? 'is-self' : ''
                       }`}
                     >
-                      {p.name} <SkillGameCount skill={p.skill} totalGames={p.totalGames} />
+                      {p.name} <SkillGameCount skill={skillCode(p.skill)} totalGames={p.totalGames} />
                     </span>
                   ))}
                 </div>

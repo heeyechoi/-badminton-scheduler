@@ -1,5 +1,6 @@
 import { useAppStore } from '../../store/useAppStore'
 import { skillIndex } from '../../lib/skill'
+import { skillCode } from '../../data/skillLevels'
 import './TargetModeControls.css'
 
 export function TargetModeControls() {
@@ -29,7 +30,7 @@ export function TargetModeControls() {
           <option value="">추가할 선수 선택</option>
           {selectable.map((p) => (
             <option key={p.id} value={p.id}>
-              {p.name} ({p.skill})
+              {p.name} ({skillCode(p.skill)})
             </option>
           ))}
         </select>
@@ -43,7 +44,7 @@ export function TargetModeControls() {
         <div className="target-mode-chips">
           {targets.map((p) => (
             <span key={p.id} className="target-mode-chip">
-              {p.name} ({p.skill})
+              {p.name} ({skillCode(p.skill)})
               <button
                 type="button"
                 onClick={() => toggleTargetPlayer(p.id)}
