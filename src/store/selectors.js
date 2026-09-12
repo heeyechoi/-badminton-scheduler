@@ -155,17 +155,13 @@ export function pairCount(playerA, playerB, activeGameByPlayer) {
   return completed + (playingTogetherNow(playerA, playerB, activeGameByPlayer) ? 1 : 0)
 }
 
-/**
- * A player's game log: every active or completed game they were part of, newest
- * first, with teammates/opponents already resolved to player objects. Queued
- * games are excluded since they haven't actually been played yet.
- * @param {string} playerId
- * @param {Record<string, object>} gamesById
- * @param {Map<string, object>} byId players indexed by id, e.g. from playersById()
- */
-export function gameLogForPlayer(playerId, gamesById, byId) {
+/** Every played game, or only one player's games when playerId is provided. */
+export function gameLog(gamesById, byId, playerId = null) {
   return Object.values(gamesById)
-    .filter((g) => g.status !== 'queued' && gamePlayerIds(g).includes(playerId))
+    .filter(
+      (g) =>
+        g.status !== 'queued' && (!playerId || gamePlayerIds(g).includes(playerId)),
+    )
     .map((g) => {
       const players = gamePlayerIds(g).map((id) => byId.get(id)).filter(Boolean)
       const timestamp = g.endedAt ?? g.startedAt ?? g.createdAt

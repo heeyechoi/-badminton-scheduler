@@ -64,6 +64,7 @@ React + Vite + Zustand 기반 배드민턴 클럽 코트/게임 스케줄러. �
 
 ### 게임 로그
 - 헤더에 "게임로그 보기" 버튼 → 이름 검색 + 참가자 리스트 + 선택한 사람의 게임 이력(팀 전체를 이름 카드 그리드로, 최신순, 진행중 배지, "총 n게임(혼x·남/여y)")
+- **이름 미선택 시 전체 게임 로그 표시**: 예전엔 참가자를 선택 안 하면 빈 화면(안내 문구만)이었는데, `selectors.js`의 `gameLog(gamesById, byId, playerId=null)`이 `playerId`가 없으면 전체(진행중+완료, 대기열 제외) 게임을 최신순으로 반환하도록 이미 되어 있던 걸 `GameLogModal`이 안 쓰고 있었음 — `gameLogForPlayer`(playerId 필수 래퍼, 이제 삭제됨) 대신 `gameLog`를 직접 호출하도록 바꿔서 "이름 선택 안 하면 전체보기"가 되게 함. 이름 다시 클릭하거나 검색어 지우면 전체보기로 돌아감.
 
 ### 표시/기타
 - 코트 배정 시 띵동 소리 + 이름 2회 TTS 안내(직접 배정/대기열 자동 채움 모두). 헤더의 🔊/🔇 버튼(설정 버튼 왼쪽)으로 켜고 끌 수 있음 — `soundEnabled`(persist 대상)를 두 호출 지점(`_createGameFromPlayerIds`, `_tryFillCourt`)에서 각각 체크. 미리보기(`?display=1`) 화면은 Firebase 구독만으로 상태를 받아오고 이 액션들을 직접 실행하지 않으므로 애초에 소리가 나지 않음 — 뮤트 컨트롤은 관리자 화면에만 있으면 충분
@@ -90,6 +91,7 @@ React + Vite + Zustand 기반 배드민턴 클럽 코트/게임 스케줄러. �
 - `src/lib/firebase.js`에 `firebaseConfig`(apiKey 포함)가 커밋되어 있음 — Firebase apiKey는 비밀값이 아니고, 실제 접근 제어는 Realtime Database 규칙(Console → 데이터베이스 및 스토리지 → 규칙)으로 함. 현재 규칙은 `liveState` 경로만 read/write 모두 공개, 나머지는 차단.
 - **초기 로드 시 반드시 즉시 push 필요**: Zustand `persist`가 모듈 임포트 시점에 동기적으로 localStorage를 복원하는데, 이는 `main.jsx`의 `useAppStore.subscribe(...)` 등록보다 먼저 끝나버림. 그래서 구독만 걸어두면 "이미 복원된 초기 상태"는 한 번도 Firebase에 안 올라가고, 이후 진짜 변경이 생겨야만 올라감 — 뷰어가 관리자의 첫 조작 전에 접속하면 빈 화면을 보게 되는 버그였음. `subscribe()` 등록 직후 `pushState(useAppStore.getState())`를 한 번 더 호출해서 해결(`src/main.jsx`).
 - npm에 `firebase` 패키지를 새로 설치한 뒤에는 이미 떠 있던 dev 서버를 **재시작**해야 함(HMR만으로는 안 됨) — 안 하면 콘솔 에러 없이 Firebase 쓰기가 조용히 실패함.
+- **RTDB는 빈 배열/객체를 스냅샷에서 통째로 생략함** — 예를 들어 마지막 대기 게임이 코트에 배정돼 `queueOrder`가 `[]`가 되면, Firebase에 실제로 저장은 되지만 `snapshot.val()`엔 그 키 자체가 안 나타남. `useAppStore.setState(data)`는 얕은 병합이라 이 경우 로컬(뷰어 화면 등)에 남아있던 **이전 `queueOrder`가 그대로 유지**되는 버그가 있었음(→ "코트 배정된 게임이 대기 목록에 계속 남아있다가 다음 대기 게임이 생기면 그제서야 사라짐"으로 체감됨). `main.jsx`의 `applyLiveState(data)`가 `queueOrder: data.queueOrder ?? []`로 명시적으로 빈 배열을 복원해서 해결 — **RTDB에서 온 데이터를 `setState`에 그대로 넘기지 말고, 비어있을 수 있는 배열/객체 필드는 항상 `?? []`/`?? {}`로 기본값을 채워줘야 함**(courts/players/gamesById 등 다른 배열·객체 필드도 이론상 같은 함정이 있음 — 지금은 queueOrder만 고쳐져 있고 나머지는 아직 미해결일 수 있으니 비슷한 증상 나오면 이 패턴부터 의심할 것).
 
 ## 설계 원칙 / 주의사항
 

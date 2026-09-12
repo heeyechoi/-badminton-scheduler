@@ -5,7 +5,7 @@ import { useAppStore } from '../../store/useAppStore'
 import { skillIndex } from '../../data/skillLevels'
 import { genderColorClass } from '../../lib/genderColor'
 import { formatClockTime } from '../../lib/time'
-import { playersById, gameLogForPlayer } from '../../store/selectors'
+import { playersById, gameLog } from '../../store/selectors'
 import { SkillGameCount } from '../common/SkillGameCount'
 import './GameLogModal.css'
 
@@ -30,7 +30,7 @@ export function GameLogModal({ onClose }) {
   const selected = selectedId ? byId.get(selectedId) : null
 
   const log = useMemo(
-    () => (selected ? gameLogForPlayer(selected.id, gamesById, byId) : []),
+    () => gameLog(gamesById, byId, selected?.id),
     [selected, gamesById, byId],
   )
 
@@ -53,7 +53,11 @@ export function GameLogModal({ onClose }) {
             className="text-input"
             placeholder="이름 검색"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              const nextQuery = e.target.value
+              setQuery(nextQuery)
+              if (!nextQuery.trim()) setSelectedId(null)
+            }}
             autoFocus
           />
           <div className="gamelog-player-list">
@@ -65,7 +69,7 @@ export function GameLogModal({ onClose }) {
                 className={`gamelog-player-row ${genderColorClass(p)} ${
                   selectedId === p.id ? 'is-selected' : ''
                 }`}
-                onClick={() => setSelectedId(p.id)}
+                onClick={() => setSelectedId((current) => (current === p.id ? null : p.id))}
               >
                 <span className="gamelog-player-name">{p.name}</span>
                 <span className="gamelog-player-skill">{p.skill}</span>
@@ -75,46 +79,50 @@ export function GameLogModal({ onClose }) {
         </div>
 
         <div className="gamelog-main">
-          {!selected && <p className="empty-hint">참가자를 선택하면 게임 기록을 볼 수 있습니다.</p>}
-          {selected && (
-            <>
-              <div className="gamelog-main-header">
+          <div className="gamelog-main-header">
+            {selected ? (
+              <>
                 <span className="gamelog-main-name">{selected.name}</span>
                 <span className="gamelog-main-skill">{selected.skill}</span>
                 <span className="gamelog-main-count">
                   총 {log.length}게임 (혼{typeCounts.혼복 ?? 0}·{sameGenderLabel}
                   {typeCounts[sameGenderType] ?? 0})
                 </span>
+              </>
+            ) : (
+              <>
+                <span className="gamelog-main-name">전체</span>
+                <span className="gamelog-main-count">총 {log.length}게임</span>
+              </>
+            )}
+          </div>
+          <div className="gamelog-entries">
+            {log.length === 0 && <p className="empty-hint">아직 게임 기록이 없습니다.</p>}
+            {log.map(({ game, players: gamePlayers, timestamp }) => (
+              <div key={game.id} className="gamelog-entry">
+                <div className="gamelog-entry-top">
+                  <Badge tone="neutral">{game.type}</Badge>
+                  <Badge tone="neutral">{game.classification}</Badge>
+                  {game.status === 'active' && <Badge tone="warning">진행중</Badge>}
+                  <span className="gamelog-entry-time">
+                    {formatClockTime(timestamp, { withSeconds: false })}
+                  </span>
+                </div>
+                <div className="gamelog-entry-grid">
+                  {gamePlayers.map((p) => (
+                    <span
+                      key={p.id}
+                      className={`gamelog-entry-player ${genderColorClass(p)} ${
+                        p.id === selected?.id ? 'is-self' : ''
+                      }`}
+                    >
+                      {p.name} <SkillGameCount skill={p.skill} totalGames={p.totalGames} />
+                    </span>
+                  ))}
+                </div>
               </div>
-              <div className="gamelog-entries">
-                {log.length === 0 && <p className="empty-hint">아직 게임 기록이 없습니다.</p>}
-                {log.map(({ game, players: gamePlayers, timestamp }) => (
-                  <div key={game.id} className="gamelog-entry">
-                    <div className="gamelog-entry-top">
-                      <Badge tone="neutral">{game.type}</Badge>
-                      <Badge tone="neutral">{game.classification}</Badge>
-                      {game.status === 'active' && <Badge tone="warning">진행중</Badge>}
-                      <span className="gamelog-entry-time">
-                        {formatClockTime(timestamp, { withSeconds: false })}
-                      </span>
-                    </div>
-                    <div className="gamelog-entry-grid">
-                      {gamePlayers.map((p) => (
-                        <span
-                          key={p.id}
-                          className={`gamelog-entry-player ${genderColorClass(p)} ${
-                            p.id === selected.id ? 'is-self' : ''
-                          }`}
-                        >
-                          {p.name} <SkillGameCount skill={p.skill} totalGames={p.totalGames} />
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
+            ))}
+          </div>
         </div>
       </div>
     </Modal>

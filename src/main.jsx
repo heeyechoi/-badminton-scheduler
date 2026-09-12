@@ -20,6 +20,15 @@ window.addEventListener('storage', (event) => {
 const isDisplay = new URLSearchParams(window.location.search).get('display') === '1'
 const liveStateRef = ref(db, LIVE_STATE_PATH)
 
+// Realtime Database omits empty arrays from snapshot.val(). Zustand's setState
+// shallow-merges partial objects, so explicitly restore the empty queue instead
+// of leaving a viewer's previous queueOrder in memory.
+const applyLiveState = (data) =>
+  useAppStore.setState({
+    ...data,
+    queueOrder: data.queueOrder ?? [],
+  })
+
 if (isDisplay) {
   // Viewers never write — they just mirror whatever the admin last pushed,
   // regardless of what device or browser they're on.
@@ -27,7 +36,7 @@ if (isDisplay) {
     liveStateRef,
     (snapshot) => {
       const data = snapshot.val()
-      if (data) useAppStore.setState(data)
+      if (data) applyLiveState(data)
     },
     (err) => console.error('Firebase live-state read failed:', err),
   )
@@ -64,7 +73,7 @@ if (isDisplay) {
       const data = snapshot.val()
       if (data) {
         applyingRemote = true
-        useAppStore.setState(data)
+        applyLiveState(data)
         applyingRemote = false
       } else if (!hasReceivedSnapshot) {
         // Nobody has a session running yet — seed Firebase from whatever this
